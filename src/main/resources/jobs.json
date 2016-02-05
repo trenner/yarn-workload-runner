@@ -1,0 +1,27 @@
+{ "jobs": {
+  // /bin/flink run -m yarn-cluster -yn 4 -yjm 1024 -ytm 4096 ./examples/WordCount.jar
+    "job":{
+      "job-name": "job1",
+      "runner": "flink",
+      "upfront": "",
+      "arguments": {
+        "-m": "yarn-cluster",
+        "-yn": "4",
+        "-yim": 1024,
+        "-ytm": 4096,
+      },
+      "end": "./examples/WordCount.jar"
+    },
+
+  // yarn jar <jar> [mainClass] args...
+    "job":{
+      "job-name": "job1",
+      "runner": "yarn",
+      "upfront": "",
+      "arguments": {
+        "jar": "/path/to/jar.jar"
+      },
+      "end": "TestDFSIO write -fsize 1000"
+    }
+
+}}
