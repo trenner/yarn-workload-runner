@@ -9,7 +9,16 @@
             <parameter name="yn">4</parameter>
             <parameter name="yjm">1024</parameter>
             <parameter name="ytm">4096</parameter>
-            <parameter>512</parameter>
+        </parameters>
+    </job>
+    <job name="jobB">
+        <framework>flink</framework>
+        <jar>./examples/wordcount.jar</jar>
+        <parameters>
+            <parameter name="m">yarn-cluster</parameter>
+            <parameter name="yn">2</parameter>
+            <parameter name="yjm">512</parameter>
+            <parameter name="ytm">2048</parameter>
         </parameters>
     </job>
 </jobs>

@@ -18,27 +18,28 @@ public class YarnTimedGenerator implements Runnable {
 
         // Load Schedule
         ArrayList<Long> delays = new ArrayList<>();
+        delays.add(new Long(0));
 
-        int i = 0;
-        for (Job job : jobs) {
-            job.setDelay(delays.get(i++));
+        for (int i = 0; i < jobs.size(); i++) {
+            System.out.println(jobs.get(i).getCommand());
+            jobs.get(i).setDelay(delays.get(i));
         }
 
         // run jobs according to schedule
         // TODO: this needs to happen in different threads
-        Yarn yarn = new Yarn();
-        for (Job job: jobs) {
-            try {
-                wait(job.getDelay());
-            } catch (Exception e) {e.printStackTrace();}
-            yarn.submitApplication(job);
-        }
+//        Yarn yarn = new Yarn();
+//        for (Job job: jobs) {
+//            try {
+//                wait(job.getDelay());
+//            } catch (Exception e) {e.printStackTrace();}
+//            yarn.submitApplication(job);
+//        }
 
         // collect logs
     }
 
     public static void main(String[] args) {
-        System.out.println("Running.");
+        System.out.println("Yarn timed Generator.");
         // TODO: appropriate threading
         (new Thread(new YarnTimedGenerator())).start();
     }

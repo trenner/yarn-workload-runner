@@ -7,28 +7,23 @@ import java.io.File;
  */
 public abstract class Job { // TODO: make it abstract and then specific flink job, spark job, etc.
 
-    private String jarFile;
-    private String mainClass;
-    private String arguments;
-    private String runner;
+    protected String jarFile;
+    protected String mainClass;
+    protected String arguments;
+    protected String runner;
 
-    private String JobID;
-    private long delay;
+    protected String JobID;
+    protected long delay;
 
     public Job() {
         // TODO: fix default constructor
-    }
-
-    public Job(String jarFile, String mainClass, String arguments) {
-        this.jarFile = jarFile;
-        this.mainClass = mainClass;
-        this.arguments = arguments;
+        arguments = "";
     }
 
     public abstract String getCommand();
 
     public void addParameter(String argument, String value) {
-        arguments = arguments + " " + argument + " " + value;
+        arguments += argument + " " + value + " ";
     }
 
     public String getJarFile() {

@@ -42,6 +42,7 @@ public class JobParser {
             for (Element jobElement : jobs) {
                 // TODO: get framework and create appropriate job
                 FlinkJob flinkJob = new FlinkJob();
+                // TODO: get job name
                 // get jar path
                 flinkJob.setJarFile(jobElement.getElementsByTagName("jar").item(0).getTextContent());
                 // get parameters
@@ -50,17 +51,16 @@ public class JobParser {
                 for (int i = 0; i < parameters.getLength(); i++) {
                     Node parameter = parameters.item(i);
                     if (parameter.getNodeType() == Node.ELEMENT_NODE) {
-                        String argument = parameter.getAttributes().item(0).getNodeValue();
-                        // String argument = p.toString();
-                        String value = parameter.getTextContent();
-                        flinkJob.addParameter(argument, value);
+                        String parameterName = "";
+                        NamedNodeMap attributes = parameter.getAttributes();
+                        if (attributes.getLength() != 0) {
+                            parameterName = parameter.getAttributes().item(0).getNodeValue();
+                        }
+                        flinkJob.addParameter(parameterName, parameter.getTextContent());
                     }
                 }
-                System.out.println(flinkJob.getCommand());
                 jobList.add(flinkJob);
             }
-
-            System.out.println(jobList);
             return jobList;
         } catch (Exception e) {
             e.printStackTrace();

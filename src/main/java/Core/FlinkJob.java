@@ -11,6 +11,6 @@ public class FlinkJob extends Job {
         // /bin/flink run -m yarn-cluster -yn 4 -yjm 1024 -ytm 4096 ./examples/WordCount.jar
         // yarn jar <jar> [mainClass] args...
         String systemHome = "/Users/Johannes/arbeit/systems/flink-0.10.1";
-        return systemHome + "/bin/flink run -m yarn-cluster -yn 4 -yjm 1024 -ytm 4096 " + systemHome + "/examples/WordCount.jar";
+        return systemHome + "/bin/flink run" + arguments + " " + systemHome + jarFile;
     }
 }
