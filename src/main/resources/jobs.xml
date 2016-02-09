@@ -5,10 +5,11 @@
         <framework>flink</framework>
         <jar>./examples/wordcount.jar</jar>
         <parameters>
-            <argument name="m">yarn-cluster</argument>
-            <argument name="yn">4</argument>
-            <argument name="yjm">1024</argument>
-            <argument name="ytm">4096</argument>
+            <parameter name="m">yarn-cluster</parameter>
+            <parameter name="yn">4</parameter>
+            <parameter name="yjm">1024</parameter>
+            <parameter name="ytm">4096</parameter>
+            <parameter>512</parameter>
         </parameters>
     </job>
 </jobs>
