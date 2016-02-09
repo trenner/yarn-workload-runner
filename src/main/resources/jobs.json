@@ -1,4 +1,6 @@
 { "jobs": {
+  // TODO: flink runner has priority
+  // TODO: make it xml
   // /bin/flink run -m yarn-cluster -yn 4 -yjm 1024 -ytm 4096 ./examples/WordCount.jar
     "job":{
       "job-name": "job1",

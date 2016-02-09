@@ -1,32 +1,42 @@
+package Core;
+
 import java.io.File;
 
 /**
  * Created by Johannes on 01/02/16.
  */
-public class YarnApp {
+public abstract class Job { // TODO: make it abstract and then specific flink job, spark job, etc.
 
     private String jarFile;
     private String mainClass;
     private String arguments;
+    private String runner;
 
     private String JobID;
     private long delay;
 
+    public Job() {
+        // TODO: fix default constructor
+    }
 
-    public YarnApp(String jarFile, String mainClass, String arguments) {
+    public Job(String jarFile, String mainClass, String arguments) {
         this.jarFile = jarFile;
         this.mainClass = mainClass;
         this.arguments = arguments;
     }
 
-    // /bin/flink run -m yarn-cluster -yn 4 -yjm 1024 -ytm 4096 ./examples/WordCount.jar
-    // yarn jar <jar> [mainClass] args...
-    public String getCommand() {
+    public abstract String getCommand();
 
-        // TODO: put together the command
+    public void addParameter(String argument, String value) {
+        arguments = arguments + " " + argument + " " + value;
+    }
 
-        String systemHome = "/Users/Johannes/arbeit/systems/flink-0.10.1";
-        return systemHome + "/bin/flink run -m yarn-cluster -yn 4 -yjm 1024 -ytm 4096 " + systemHome + "/examples/WordCount.jar";
+    public String getJarFile() {
+        return jarFile;
+    }
+
+    public void setJarFile(String jarFile) {
+        this.jarFile = jarFile;
     }
 
     public String getJobID() {

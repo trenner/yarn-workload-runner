@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<jobs>
+    <job name="jobA">
+        <framework>flink</framework>
+        <jar>./examples/wordcount.jar</jar>
+        <parameters>
+            <argument name="m">yarn-cluster</argument>
+            <argument name="yn">4</argument>
+            <argument name="yjm">1024</argument>
+            <argument name="ytm">4096</argument>
+        </parameters>
+    </job>
+</jobs>

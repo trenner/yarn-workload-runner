@@ -8,6 +8,14 @@
     <artifactId>YarnTimer</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <dependencies>
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>1.2.17</version>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>
@@ -49,7 +57,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>YarnTimedGenerator</mainClass>
+                            <mainClass>Core.YarnTimedGenerator</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -70,7 +78,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>YarnTimedGenerator</mainClass>
+                            <mainClass>Core.YarnTimedGenerator</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

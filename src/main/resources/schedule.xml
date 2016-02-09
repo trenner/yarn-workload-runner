@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite>
+    <experiment>
+        <job name="jobA">100</job>
+        <job name="jobA">200</job>
+        <job name="jobA">300</job>
+    </experiment>
+    <experiment>
+        <job name="jobA">50</job>
+        <job name="jobA">100</job>
+        <job name="jobA">150</job>
+    </experiment>
+</suite>

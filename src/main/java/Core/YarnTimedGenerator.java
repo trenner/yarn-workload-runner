@@ -1,3 +1,5 @@
+package Core;
+
 import java.util.ArrayList;
 
 public class YarnTimedGenerator implements Runnable {
@@ -6,8 +8,8 @@ public class YarnTimedGenerator implements Runnable {
         System.out.println("Thread running.");
 
         // Load Jobs
-        ArrayList<YarnApp> jobs = new ArrayList<YarnApp>();
-        jobs.add(new YarnApp("","",""));
+        ArrayList<Job> jobs = new ArrayList<Job>();
+        jobs.add(new FlinkJob());
 
         // Load Config(s)
 
@@ -16,7 +18,7 @@ public class YarnTimedGenerator implements Runnable {
         // add delays
 
         int i = 0;
-        for (YarnApp job : jobs) {
+        for (Job job : jobs) {
             job.setDelay(delays.get(i++));
         }
 
@@ -27,7 +29,7 @@ public class YarnTimedGenerator implements Runnable {
 
         // run jobs according to schedule
         Yarn yarn = new Yarn();
-        for (YarnApp job: jobs) {
+        for (Job job: jobs) {
             try {
                 wait(job.getDelay());
             } catch (Exception e) {e.printStackTrace();}
