@@ -1,7 +1,5 @@
 package Core;
 
-import java.io.File;
-
 /**
  * Created by Johannes on 01/02/16.
  */
@@ -11,9 +9,9 @@ public abstract class Job { // TODO: make it abstract and then specific flink jo
     protected String mainClass;
     protected String arguments;
     protected String runner;
+    protected String jobName;
 
     protected String JobID;
-    protected long delay;
 
     public Job() {
         // TODO: fix default constructor
@@ -42,11 +40,20 @@ public abstract class Job { // TODO: make it abstract and then specific flink jo
         JobID = jobID;
     }
 
-    public long getDelay() {
-        return delay;
+    public String getJobName() {
+        return jobName;
     }
 
-    public void setDelay(long delay) {
-        this.delay = delay;
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
+    }
+
+    @Override
+    public String toString() {
+        return "Job{" +
+                "runner='" + runner + '\'' +
+                ", jobName='" + jobName + '\'' +
+                ", jarFile='" + jarFile + '\'' +
+                '}';
     }
 }

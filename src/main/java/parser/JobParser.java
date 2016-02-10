@@ -1,16 +1,14 @@
 package parser;
 
-import Core.Job;
-import org.w3c.dom.*;
-
+import Core.FlinkJob;
 import org.apache.log4j.Logger;
+import org.w3c.dom.*;
+import util.JobList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.ArrayList;
-
-import Core.FlinkJob;
 
 /**
  * Created by Johannes on 03/02/16.
@@ -18,7 +16,7 @@ import Core.FlinkJob;
 public class JobParser {
     private static final Logger LOG = Logger.getLogger(JobParser.class);
 
-    public static ArrayList<Job> parseJobs(File jobFile) {
+    public static JobList parseJobs(File jobFile) {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
@@ -26,9 +24,8 @@ public class JobParser {
             doc.getDocumentElement().normalize();
 
             NodeList jobNodeList = doc.getElementsByTagName("job");
-
+            // TODO: this seems redundant, get it straight from the NodeList
             ArrayList<Element> jobs = new ArrayList<>();
-
             for (int i = 0; i < jobNodeList.getLength(); i++) {
                 Node node = jobNodeList.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -36,13 +33,14 @@ public class JobParser {
                 }
             }
 
-            ArrayList<Job> jobList = new ArrayList<>();
+            JobList jobList = new JobList();
 
             // per Job
             for (Element jobElement : jobs) {
                 // TODO: get framework and create appropriate job
                 FlinkJob flinkJob = new FlinkJob();
-                // TODO: get job name
+                // get job name
+                flinkJob.setJobName(jobElement.getAttribute("name"));
                 // get jar path
                 flinkJob.setJarFile(jobElement.getElementsByTagName("jar").item(0).getTextContent());
                 // get parameters
