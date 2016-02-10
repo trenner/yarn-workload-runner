@@ -2,14 +2,14 @@
 
 <suite>
     <experiment name="exp1">
-        <job name="jobA">10</job>
-        <job name="jobB">20</job>
-        <job name="jobA">30</job>
+        <job name="jobA">1000</job>
+        <job name="jobB">2000</job>
+        <job name="jobA">3000</job>
     </experiment>
 
     <experiment name="exp2">
-        <job name="jobA">50</job>
-        <job name="jobB">10</job>
-        <job name="jobA">15</job>
+        <job name="jobA">5000</job>
+        <job name="jobB">1000</job>
+        <job name="jobA">1500</job>
     </experiment>
 </suite>

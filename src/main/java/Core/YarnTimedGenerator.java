@@ -37,7 +37,7 @@ public class YarnTimedGenerator {
         Iterator<Schedule> jobScheduleIterator = experimentSchedules.iterator();
         while (jobScheduleIterator.hasNext()) {
             Yarn yarn = new Yarn(jobScheduleIterator.next(), jobs);
-            (new Thread(yarn)).start();
+            yarn.runJobs();
         }
     }
 }

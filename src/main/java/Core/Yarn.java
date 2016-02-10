@@ -4,10 +4,12 @@ import util.JobList;
 import util.JobTime;
 import util.Schedule;
 
+import java.io.IOException;
+
 /**
  * Created by Johannes on 01/02/16.
  */
-public class Yarn implements Runnable {
+public class Yarn {
     private Schedule schedule;
     private JobList jobs;
 
@@ -17,27 +19,34 @@ public class Yarn implements Runnable {
         this.jobs = jobs;
     }
 
-    public void run() {
+    public void runJobs() {
         for (JobTime jobTime: schedule) {
-            try {
-                System.out.println("Waiting " + jobTime.getDelay());
-                Thread.sleep(jobTime.getDelay());
                 Job job = jobs.getJobWithName(jobTime.getJobName());
-                submitApplication(job);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+                (new Thread(new JobRunner(job, jobTime))).start();
         }
     }
 
-    private boolean submitApplication(Job job) {
-        try {
-            System.out.println("Executing " + job);
-//            Runtime.getRuntime().exec(job.getCommand());
-        } catch (Exception e) {
-            e.printStackTrace();
+    private class JobRunner implements Runnable {
+
+        private Job job;
+        private JobTime jobTime;
+
+        public JobRunner(Job job, JobTime jobTime) {
+            this.job = job;
+            this.jobTime = jobTime;
         }
-        return true;
+
+        public void run() {
+            try {
+                System.out.println("Waiting " + jobTime.getDelay() + " to execute " + jobTime.getJobName());
+                Thread.sleep(jobTime.getDelay());
+                System.out.println("Executing " + job);
+                Runtime.getRuntime().exec(job.getCommand());
+//                Runtime.getRuntime().exec("mkdir /Users/Johannes/arbeit/yarn-timed-workload-generator/madeIt");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 }
