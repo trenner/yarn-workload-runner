@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<suite>
+    <experiment name="exp1">
+        <job name="jobA">1000</job>
+        <job name="jobB">2000</job>
+        <job name="jobA">3000</job>
+    </experiment>
+
+    <experiment name="exp2">
+        <job name="jobA">5000</job>
+        <job name="jobB">1000</job>
+        <job name="jobA">1500</job>
+    </experiment>
+</suite>
