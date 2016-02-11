@@ -52,7 +52,7 @@ public class JobParser {
                         String parameterName = "";
                         NamedNodeMap attributes = parameter.getAttributes();
                         if (attributes.getLength() != 0) {
-                            parameterName = parameter.getAttributes().item(0).getNodeValue();
+                            parameterName = "-" + parameter.getAttributes().item(0).getNodeValue();
                         }
                         flinkJob.addParameter(parameterName, parameter.getTextContent());
                     }
