@@ -38,9 +38,9 @@ schedule.xml
 </suite>
 ```
 
-in YarnTimedGenerator.java fill in the Locations of above files and then
+the locations of the above files must be stated as arguments in the correct order
 
 ```
 mvn clean install
-java -jar YarnTimer-1.0-SNAPSHOT.jar
+java -jar target/YarnTimer-1.0-SNAPSHOT.jar src/main/resources/jobs.xml src/main/resources/schedule.xml
 ```

@@ -23,13 +23,13 @@ public class YarnTimedGenerator {
         System.out.println("Thread running.");
 
         // Load Jobs from jobfile
-        File jobFile = new File(JOB_FILE);
+        File jobFile = new File(args[0]);
         JobList jobs = JobParser.parseJobs(jobFile);
 
         // Load Config(s)
 
         // Load Schedule
-        File scheduleFile = new File(SCHEDULE_FILE);
+        File scheduleFile = new File(args[1]);
         ArrayList<Schedule> experimentSchedules = ScheduleParser.parseSchedule(scheduleFile);
 
 
