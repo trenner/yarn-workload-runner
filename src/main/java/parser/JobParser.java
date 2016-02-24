@@ -1,6 +1,6 @@
 package parser;
 
-import Core.FlinkJob;
+
 import Core.Job;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
@@ -10,14 +10,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.HashMap;
 
 /**
  * Created by Johannes on 03/02/16.
  */
 public class JobParser {
+    // TODO: Use the logger or get rid of it
     private static final Logger LOG = Logger.getLogger(JobParser.class);
 
     public static JobList parseJobs(File jobFile) {
@@ -40,7 +39,7 @@ public class JobParser {
 
             // per Job
             for (Element jobElement : jobs) {
-                FlinkJob job = new FlinkJob();
+                Job job = new Job();
 
                 job.setJobName(jobElement.getAttribute("name"));
 
@@ -67,8 +66,7 @@ public class JobParser {
             Node item = runnerChildNodes.item(i);
             switch (item.getNodeName()) {
                 case "name":
-//                    TODO: add appropriate CommandBuilder
-                    item.getTextContent();
+                    job.setRunner(item.getTextContent());
                     break;
                 case "arguments":
                     job.setRunnerArguments(getArguments(item , "-"));
