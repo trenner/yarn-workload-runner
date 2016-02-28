@@ -38,7 +38,7 @@ public class ScheduleParser {
             ArrayList<Schedule> schedules = new ArrayList<>();
 
             for (Element experimentElement: experiments) {
-                Schedule experimentSchedule = new Schedule();
+                Schedule experimentSchedule = new Schedule(experimentElement.getAttribute("name"));
 
                 NodeList jobTimes = experimentElement.getChildNodes();
                 for (int i = 0; i < jobTimes.getLength(); i++){
@@ -52,7 +52,6 @@ public class ScheduleParser {
                 schedules.add(experimentSchedule);
             }
             // per experiment
-
             return schedules;
         } catch (Exception e) {
             e.printStackTrace();
@@ -60,5 +59,4 @@ public class ScheduleParser {
 
         return null;
     }
-
 }
