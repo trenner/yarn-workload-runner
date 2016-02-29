@@ -1,5 +1,7 @@
 package Core.commandBuilder;
 
+import util.Config;
+
 /**
  * Created by Johannes on 08/02/16.
  */
@@ -7,8 +9,12 @@ public class FlinkCommandBuilder implements CommandBuilder {
 
     @Override
     public String getCommand(String runnerArguments, String jarFile, String jarArguments) {
-        // TODO: systemHome should be read from config
-        String systemHome = "/home/trenner/peel-experiments/ioaware-scheduling/systems/flink-0.10.1";
-        return systemHome + "/bin/flink run " + runnerArguments + " " + jarFile + " " + jarArguments;
+        String flinkHome = Config.getInstance().getConfigItem("flink-home-dir");
+
+        if (jarFile.charAt(0) == '.') { // if the jarfile is relative (start with '.') it will be relative to flinkhome
+            jarFile = flinkHome + "/" + jarFile.substring(1);
+        }
+
+        return flinkHome + "/bin/flink run " + runnerArguments.trim() + " " + jarFile + " " + jarArguments.trim();
     }
 }

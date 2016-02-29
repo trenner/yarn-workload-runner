@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <jobs>
-    <job name="KMeans">
-        <runner>
-            <name>flink</name>
-            <arguments>
-                <argument>value</argument>
-                <argument name="key">value</argument>
-                <argument name="m">yarn-cluster</argument>
-                <argument name="yn">2</argument>
-                <argument name="yjm">512</argument>
-                <argument name="ytm">2048</argument>
-            </arguments>
-        </runner>
-        <jar>
-            <path>/examples/wordcount.jar</path>
-            <arguments>
-                <argument name="arg1">1</argument>
-                <argument name="arg2">2</argument>
-                <argument name="arg3">3</argument>
-            </arguments>
-        </jar>
-    </job>
-
     <job name="wordcount">
         <runner>
             <name>flink</name>
             <arguments>
-                <argument>foobar</argument>
+                <argument name="m">yarn-cluster</argument>
+                <argument name="yn">2</argument>
+                <argument name="yjm">1024</argument>
+                <argument name="ytm">2048</argument>
+            </arguments>
+        </runner>
+        <jar>
+            <!-- relative paths using "." will be relative to the system home directory-->
+            <path>./examples/wordcount.jar</path>
+            <arguments>
+                <!--<argument name="arg1">1</argument>-->
+                <!--<argument name="arg2">2</argument>-->
+                <!--<argument name="arg3">3</argument>-->
+            </arguments>
+        </jar>
+    </job>
+
+    <job name="kmeans">
+        <runner>
+            <name>flink</name>
+            <arguments>
+                <argument>value</argument>
                 <argument name="key">value</argument>
                 <argument name="m">yarn-cluster</argument>
                 <argument name="yn">2</argument>

@@ -1,5 +1,13 @@
 # yarn timed workload generator
 
+The workload generator takes three arguments related to the three necessary xml files than containe the different jobs,
+experiment schedules and system configurations.
+
+Example configurations can be found as ```jobs.xml```, ```schedule.xml```, and ```config.xml``` in the ```main/resources``` folder.
+
+The YarnTimer.jar takes three arguments in the following order:
+
+YarnTimer.jar JOB_FILE SCHEDULE_FILE CONFIG_FILE
 
 ## Instructions
 
@@ -53,5 +61,5 @@ the locations of the above files must be stated as arguments in the correct orde
 
 ```
 mvn clean install
-java -jar target/YarnTimer-1.0-SNAPSHOT.jar src/main/resources/jobs.xml src/main/resources/schedule.xml
+java -jar target/YarnTimer-1.0-SNAPSHOT.jar src/main/resources/jobs.xml src/main/resources/schedule.xml src/main/resources/config.xml
 ```

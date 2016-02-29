@@ -4,7 +4,9 @@ import util.JobList;
 import util.JobTime;
 import util.Schedule;
 
-import java.io.IOException;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by Johannes on 01/02/16.
@@ -13,7 +15,6 @@ public class Yarn {
     private Schedule schedule;
     private JobList jobs;
 
-    // TODO: abstract, flink runner, yarn runner, etc.
     public Yarn(Schedule schedule, JobList jobs) {
         this.schedule = schedule;
         this.jobs = jobs;
@@ -40,9 +41,19 @@ public class Yarn {
             try {
                 System.out.println("Waiting " + jobTime.getDelay() + " to execute " + jobTime.getJobName());
                 Thread.sleep(jobTime.getDelay());
-                System.out.println("Executing " + job);
-                Runtime.getRuntime().exec(job.getCommand());
-//                Runtime.getRuntime().exec("mkdir /Users/Johannes/arbeit/yarn-timed-workload-generator/madeIt");
+                System.out.println("Executing " + job + " with command: " + job.getCommand());
+
+                InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
+                InputStreamReader isReader = new InputStreamReader(inputStream);
+                BufferedReader buff = new BufferedReader(isReader);
+                String line;
+                while((line = buff.readLine()) != null) {
+                    System.out.println(line);
+                    if (line.contains("Submitted application")) {
+                        String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application","").trim();
+                        job.setJobID(jobID);
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
