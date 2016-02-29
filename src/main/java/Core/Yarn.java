@@ -40,7 +40,7 @@ public class Yarn {
         public void run() {
             try {
                 System.out.println("Waiting " + jobTime.getDelay() + " to execute " + jobTime.getJobName());
-                Thread.sleep(jobTime.getDelay());
+                Thread.sleep(jobTime.getDelay() * 1000,0);
                 System.out.println("Executing " + job + " with command: " + job.getCommand());
 
                 InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
@@ -49,10 +49,13 @@ public class Yarn {
                 String line;
                 while((line = buff.readLine()) != null) {
                     System.out.println(line);
+                    // TODO: write log to disk (specifiy which job with name and)
                     if (line.contains("Submitted application")) {
                         String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application","").trim();
                         job.setJobID(jobID);
                     }
+                    // TODO: notify when job reaches status finished and take the time
+                    // TODO: create experiment summary file/output
                 }
             } catch (Exception e) {
                 e.printStackTrace();

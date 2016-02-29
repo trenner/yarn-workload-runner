@@ -2,14 +2,16 @@
 
 <suite>
     <experiment name="exp1">
-        <job name="wordcount">1000</job>
-        <job name="wordcount">10000</job>
-        <job name="wordcount">20000</job>
+        <job name="wordcount">1</job>
+        <job name="wordcount">10</job>
+        <job name="wordcount">20</job>
     </experiment>
 
     <!--<experiment name="exp2">-->
-        <!--<job name="kmeans">5000</job>-->
-        <!--<job name="kmeans">1000</job>-->
-        <!--<job name="kmeans">1500</job>-->
+        <!--<job name="kmeans">5</job>-->
+        <!--<job name="kmeans">1</job>-->
+        <!--<job name="kmeans">1,5</job>-->
     <!--</experiment>-->
+
+
 </suite>
