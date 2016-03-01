@@ -1,15 +1,15 @@
 package Core;
 
+import util.Config;
 import util.JobList;
 import util.JobTime;
 import util.Schedule;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 
 /**
  * Created by Johannes on 01/02/16.
+ *
  */
 public class Yarn {
     private Schedule schedule;
@@ -41,26 +41,48 @@ public class Yarn {
             try {
                 System.out.println("Waiting " + jobTime.getDelay() + " to execute " + jobTime.getJobName());
                 Thread.sleep(jobTime.getDelay() * 1000,0);
-                System.out.println("Executing " + job + " with command: " + job.getCommand());
 
+                PrintStream out = createLogPrintStream();
+
+                System.out.println("Executing " + job + " with command: " + job.getCommand());
                 InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
-                InputStreamReader isReader = new InputStreamReader(inputStream);
-                BufferedReader buff = new BufferedReader(isReader);
+                BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
+
                 String line;
                 while((line = buff.readLine()) != null) {
-                    System.out.println(line);
-                    // TODO: write log to disk (specifiy which job with name and)
+                    out.println(line);
                     if (line.contains("Submitted application")) {
                         String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application","").trim();
                         job.setJobID(jobID);
                     }
-                    // TODO: notify when job reaches status finished and take the time
+
+                    if (line.contains("Job execution switched to status FINISHED")) {
+                        // TODO: notify when job reaches status finished and take the time
+                    }
                     // TODO: create experiment summary file/output
                 }
+                out.flush();
+                out.close();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
+        private PrintStream createLogPrintStream() {
+
+            String logDir = Config.getInstance().getConfigItem("log-dir") + '/' + schedule.getExperimentName();
+            String logFileName = schedule.getExperimentName() + '-' + job.getJobName() + "+" + jobTime.getDelay();
+
+            File experimentLogDir = new File(logDir);
+            experimentLogDir.mkdirs(); // create directories if necessary
+
+            try {
+                return new PrintStream(new FileOutputStream(logDir + '/' + logFileName));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+
+            return null;
+        }
     }
 }

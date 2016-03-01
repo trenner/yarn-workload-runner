@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <config>
+    <!-- TODO: this is default, overrite by jar arguments-->
     <jobs-xml-path>/Users/Johannes/arbeit/yarn-timed-workload-generator/src/main/resources/jobs.xml</jobs-xml-path>
     <schedule-xml-path>/Users/Johannes/arbeit/yarn-timed-workload-generator/src/main/resources/schedule.xml</schedule-xml-path>
     <flink-home-dir>/Users/Johannes/arbeit/systems/flink-0.10.1</flink-home-dir>
     <hadoop-conf-dir>/Users/Johannes/arbeit/systems/hadoop-2.7.1/etc/hadoop/</hadoop-conf-dir>
+    <log-dir>/Users/Johannes/arbeit/yarn-timed-workload-generator</log-dir>
     <!--add as you wish in the style of <key>value</key> -->
 </config>
