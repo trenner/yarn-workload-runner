@@ -44,11 +44,11 @@ public class Yarn {
 
                 PrintStream out = createLogPrintStream();
 
-                System.out.println("Executing " + job + " with command: " + job.getCommand());
+                System.out.println("Executing " + job + '+' + jobTime.getDelay() + "sec with command: " + job.getCommand());
                 InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
                 BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
 
-                String line;
+                String line; long startTime = 0;
                 while((line = buff.readLine()) != null) {
                     out.println(line);
                     if (line.contains("Submitted application")) {
@@ -56,11 +56,17 @@ public class Yarn {
                         job.setJobID(jobID);
                     }
 
-                    if (line.contains("Job execution switched to status FINISHED")) {
-                        // TODO: notify when job reaches status finished and take the time
+                    if (line.contains("Job execution switched to status RUNNING.")) {
+                        startTime = System.nanoTime();
                     }
-                    // TODO: create experiment summary file/output
+
+                    if (line.contains("Job execution switched to status FINISHED")) {
+                        long endTime = System.nanoTime();
+                        long duration = (endTime - startTime);
+                        System.out.println("Executing " + job + '+' + jobTime.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
+                    }
                 }
+                // TODO: create experiment summary file/output
                 out.flush();
                 out.close();
             } catch (Exception e) {
