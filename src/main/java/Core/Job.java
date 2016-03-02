@@ -1,27 +1,78 @@
 package Core;
 
+import Core.commandBuilder.CommandBuilder;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Created by Johannes on 01/02/16.
  */
-public abstract class Job { // TODO: make it abstract and then specific flink job, spark job, etc.
+public class Job {
 
     protected String jarFile;
-    protected String mainClass;
-    protected String arguments;
+    protected String runnerArguments;
+    protected String jarArguments;
+    protected CommandBuilder cmdBuilder;
     protected String runner;
     protected String jobName;
 
     protected String JobID;
 
     public Job() {
-        // TODO: fix default constructor
-        arguments = "";
+        // TODO: optimize default constructor
+        runnerArguments = "";
+        jarArguments = "";
     }
 
-    public abstract String getCommand();
+    public String getCommand() {
+        return cmdBuilder.getCommand(runnerArguments, jarFile, jarArguments);
+    }
 
-    public void addParameter(String argument, String value) {
-        arguments += argument + " " + value + " ";
+    private void setCmdBuilder(CommandBuilder cmdBuilder) {
+        this.cmdBuilder = cmdBuilder;
+    }
+
+    public void addRunnerArgument(String argument, String value) {
+        runnerArguments += argument + " " + value + " ";
+    }
+
+    public void addJarArgument(String argument, String value) {
+        jarArguments += argument + " " + value + " ";
+    }
+
+    /**
+     * Sets the runner and picks the appropriate CommandBuilder.
+     * @param runner
+     */
+    public void setRunner(String runner) {
+        this.runner = runner;
+        try {
+            cmdBuilder = CommandBuilder.getCommandBuilder(runner);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            e.printStackTrace();
+        }
+
+    }
+
+    public void setRunnerArguments(HashMap runnerArguments) {
+        Iterator argIterator = runnerArguments.entrySet().iterator();
+        while (argIterator.hasNext()) {
+            Map.Entry entry = (Map.Entry) argIterator.next();
+            addRunnerArgument((String) entry.getKey(), (String) entry.getValue());
+            argIterator.remove(); // avoids a ConcurrentModificationException
+        }
+    }
+
+    public void setJarArguments(HashMap jarArguments) {
+        Iterator argIterator = jarArguments.entrySet().iterator();
+        while (argIterator.hasNext()) {
+            Map.Entry entry = (Map.Entry) argIterator.next();
+            addJarArgument((String) entry.getKey(), (String) entry.getValue());
+            argIterator.remove(); // avoids a ConcurrentModificationException
+        }
     }
 
     public String getJarFile() {

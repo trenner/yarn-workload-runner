@@ -9,15 +9,26 @@ make a jobs.xml file where all your jobs are defined
 jobs.xml
 
 <jobs>
-    <job name="jobA">
-        <framework>flink</framework>
-        <jar>./examples/wordcount.jar</jar>
-        <parameters>
-            <parameter name="m">yarn-cluster</parameter>
-            <parameter name="yn">4</parameter>
-            <parameter name="yjm">1024</parameter>
-            <parameter name="ytm">4096</parameter>
-        </parameters>
+    <job name="KMeans">
+        <runner>
+            <name>flink</name>
+            <arguments>
+                <argument>value</argument>
+                <argument name="key">value</argument>
+                <argument name="m">yarn-cluster</argument>
+                <argument name="yn">2</argument>
+                <argument name="yjm">512</argument>
+                <argument name="ytm">2048</argument>
+            </arguments>
+        </runner>
+        <jar>
+            <path>/examples/wordcount.jar</path>
+            <arguments>
+                <argument name="arg1">1</argument>
+                <argument name="arg2">2</argument>
+                <argument name="arg3">3</argument>
+            </arguments>
+        </jar>
     </job>
     ...
 </jobs>
