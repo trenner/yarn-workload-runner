@@ -6,12 +6,4 @@
         <job name="wordcount">10</job>
         <job name="wordcount">20</job>
     </experiment>
-
-    <!--<experiment name="exp2">-->
-        <!--<job name="kmeans">5</job>-->
-        <!--<job name="kmeans">1</job>-->
-        <!--<job name="kmeans">1,5</job>-->
-    <!--</experiment>-->
-
-
 </suite>

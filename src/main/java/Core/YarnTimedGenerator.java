@@ -14,6 +14,8 @@ public class YarnTimedGenerator {
     public static void main(String[] args) {
         System.out.println("Yarn timed Generator.");
 
+        // TODO: take default values and overwrite them if necessary
+
         // Load Jobs from jobfile
         File jobFile = new File(args[0]);
         JobList jobs = JobParser.parseJobs(jobFile);
@@ -33,5 +35,7 @@ public class YarnTimedGenerator {
             yarn.runJobs();
             // TODO: wait until the last experiment finished
         }
+
+        //TODO: print out summary and write it to file in log-dir
     }
 }

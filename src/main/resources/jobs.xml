@@ -22,6 +22,8 @@
         </jar>
     </job>
 
+    <!--example command translation-->
+    <!--flinkhome/bin/flink run value -key value -m yarn-cluster -yn 2 -yjm 512 /flinkhome/examples/wordcount.jar arg1 1 arg2 2 arg3 3-->
     <job name="kmeans">
         <runner>
             <name>flink</name>
@@ -31,11 +33,10 @@
                 <argument name="m">yarn-cluster</argument>
                 <argument name="yn">2</argument>
                 <argument name="yjm">512</argument>
-                <argument name="ytm">2048</argument>
             </arguments>
         </runner>
         <jar>
-            <path>/examples/wordcount.jar</path>
+            <path>./examples/wordcount.jar</path>
             <arguments>
                 <argument name="arg1">1</argument>
                 <argument name="arg2">2</argument>

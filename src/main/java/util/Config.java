@@ -32,7 +32,7 @@ public class Config {
         return instance;
     }
 
-    public Config(File configFile) {
+    private Config(File configFile) {
         config = ConfigParser.parseConfig(configFile);
     }
 
