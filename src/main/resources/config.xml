@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<config>
+    <flink-home-dir>/Users/Johannes/arbeit/systems/flink-0.10.1</flink-home-dir>
+    <log-dir>/Users/Johannes/arbeit/yarn-timed-workload-generator/logs</log-dir>
+
+    <!--not supported right now-->
+    <!--<jobs-xml-path>/Users/Johannes/arbeit/yarn-timed-workload-generator/src/main/resources/jobs.xml</jobs-xml-path>-->
+    <!--<schedule-xml-path>/Users/Johannes/arbeit/yarn-timed-workload-generator/src/main/resources/schedule.xml</schedule-xml-path>-->
+</config>
