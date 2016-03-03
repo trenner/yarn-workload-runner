@@ -2,9 +2,7 @@ package Core;
 
 import Core.commandBuilder.CommandBuilder;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Johannes on 01/02/16.
@@ -57,22 +55,24 @@ public class Job {
 
     }
 
-    public void setRunnerArguments(HashMap runnerArguments) {
-        Iterator argIterator = runnerArguments.entrySet().iterator();
-        while (argIterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) argIterator.next();
-            addRunnerArgument((String) entry.getKey(), (String) entry.getValue());
-            argIterator.remove(); // avoids a ConcurrentModificationException
+    public void setRunnerArguments(ArrayList<String> runnerArguments) {
+        for (String argument : runnerArguments) {
+            addRunnerArgument(argument, "");
         }
     }
 
-    public void setJarArguments(HashMap jarArguments) {
-        Iterator argIterator = jarArguments.entrySet().iterator();
-        while (argIterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) argIterator.next();
-            addJarArgument((String) entry.getKey(), (String) entry.getValue());
-            argIterator.remove(); // avoids a ConcurrentModificationException
+    public String getRunnerArguments() {
+        return runnerArguments;
+    }
+
+    public void setJarArguments(ArrayList<String> jarArguments) {
+        for (String argument: jarArguments) {
+            addJarArgument(argument, "");
         }
+    }
+
+    public String getJarArguments() {
+        return jarArguments;
     }
 
     public String getJarFile() {
