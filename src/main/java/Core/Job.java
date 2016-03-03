@@ -10,8 +10,8 @@ import java.util.*;
 public class Job {
 
     protected String jarFile;
-    protected String runnerArguments;
-    protected String jarArguments;
+    protected ArrayList<String> runnerArguments;
+    protected ArrayList<String> jarArguments;
     protected CommandBuilder cmdBuilder;
     protected String runner;
     protected String jobName;
@@ -20,8 +20,6 @@ public class Job {
 
     public Job() {
         // TODO: optimize default constructor
-        runnerArguments = "";
-        jarArguments = "";
     }
 
     public String getCommand() {
@@ -30,14 +28,6 @@ public class Job {
 
     private void setCmdBuilder(CommandBuilder cmdBuilder) {
         this.cmdBuilder = cmdBuilder;
-    }
-
-    public void addRunnerArgument(String argument, String value) {
-        runnerArguments += argument + " " + value + " ";
-    }
-
-    public void addJarArgument(String argument, String value) {
-        jarArguments += argument + " " + value + " ";
     }
 
     /**
@@ -52,26 +42,21 @@ public class Job {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-
     }
 
     public void setRunnerArguments(ArrayList<String> runnerArguments) {
-        for (String argument : runnerArguments) {
-            addRunnerArgument(argument, "");
-        }
+        this.runnerArguments = runnerArguments;
     }
 
-    public String getRunnerArguments() {
+    public ArrayList<String> getRunnerArguments() {
         return runnerArguments;
     }
 
     public void setJarArguments(ArrayList<String> jarArguments) {
-        for (String argument: jarArguments) {
-            addJarArgument(argument, "");
-        }
+        this.jarArguments = jarArguments;
     }
 
-    public String getJarArguments() {
+    public ArrayList<String> getJarArguments() {
         return jarArguments;
     }
 
