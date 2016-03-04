@@ -2,9 +2,7 @@ package Core;
 
 import Core.commandBuilder.CommandBuilder;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by Johannes on 01/02/16.
@@ -12,8 +10,8 @@ import java.util.Map;
 public class Job {
 
     protected String jarFile;
-    protected String runnerArguments;
-    protected String jarArguments;
+    protected ArrayList<String> runnerArguments;
+    protected ArrayList<String> jarArguments;
     protected CommandBuilder cmdBuilder;
     protected String runner;
     protected String jobName;
@@ -22,8 +20,6 @@ public class Job {
 
     public Job() {
         // TODO: optimize default constructor
-        runnerArguments = "";
-        jarArguments = "";
     }
 
     public String getCommand() {
@@ -32,14 +28,6 @@ public class Job {
 
     private void setCmdBuilder(CommandBuilder cmdBuilder) {
         this.cmdBuilder = cmdBuilder;
-    }
-
-    public void addRunnerArgument(String argument, String value) {
-        runnerArguments += argument + " " + value + " ";
-    }
-
-    public void addJarArgument(String argument, String value) {
-        jarArguments += argument + " " + value + " ";
     }
 
     /**
@@ -54,25 +42,22 @@ public class Job {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
-
     }
 
-    public void setRunnerArguments(HashMap runnerArguments) {
-        Iterator argIterator = runnerArguments.entrySet().iterator();
-        while (argIterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) argIterator.next();
-            addRunnerArgument((String) entry.getKey(), (String) entry.getValue());
-            argIterator.remove(); // avoids a ConcurrentModificationException
-        }
+    public void setRunnerArguments(ArrayList<String> runnerArguments) {
+        this.runnerArguments = runnerArguments;
     }
 
-    public void setJarArguments(HashMap jarArguments) {
-        Iterator argIterator = jarArguments.entrySet().iterator();
-        while (argIterator.hasNext()) {
-            Map.Entry entry = (Map.Entry) argIterator.next();
-            addJarArgument((String) entry.getKey(), (String) entry.getValue());
-            argIterator.remove(); // avoids a ConcurrentModificationException
-        }
+    public ArrayList<String> getRunnerArguments() {
+        return runnerArguments;
+    }
+
+    public void setJarArguments(ArrayList<String> jarArguments) {
+        this.jarArguments = jarArguments;
+    }
+
+    public ArrayList<String> getJarArguments() {
+        return jarArguments;
     }
 
     public String getJarFile() {

@@ -11,6 +11,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created by Johannes on 03/02/16.
@@ -92,8 +94,8 @@ public class JobParser {
         }
     }
 
-    private static HashMap getArguments(Node node, String separator) {
-        HashMap<String, String> argumentHashMap = new HashMap<>();
+    private static ArrayList<String> getArguments(Node node, String separator) {
+        ArrayList<String> argumentList = new ArrayList<>();
 
         NodeList arguments = node.getChildNodes();
         for (int i = 0; i < arguments.getLength(); i++) {
@@ -104,9 +106,9 @@ public class JobParser {
                 if (attributes.getLength() != 0) {
                     parameterName = separator + argument.getAttributes().item(0).getNodeValue();
                 }
-                argumentHashMap.put(parameterName, argument.getTextContent());
+                argumentList.add(parameterName + " " + argument.getTextContent());
             }
         }
-        return argumentHashMap;
+        return argumentList;
     }
 }
