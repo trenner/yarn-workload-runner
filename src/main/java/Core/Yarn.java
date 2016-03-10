@@ -77,7 +77,7 @@ public class Yarn {
         private PrintStream createLogPrintStream() {
 
             String logDir = Config.getInstance().getConfigItem("log-dir") + '/' + schedule.getExperimentName();
-            String logFileName = schedule.getExperimentName() + '-' + job.getJobName() + "+" + jobTime.getDelay();
+            String logFileName = schedule.getExperimentName() + '-' + job.getJobName() + "+" + jobTime.getDelay() + ".out";
 
             File experimentLogDir = new File(logDir);
             experimentLogDir.mkdirs(); // create directories if necessary
