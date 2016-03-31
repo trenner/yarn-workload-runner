@@ -4,24 +4,20 @@ package parser;
 import Core.Job;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
-import util.JobList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
 
 /**
- * Created by Johannes on 03/02/16.
+ * Created by joh-mue on 03/02/16.
  */
 public class JobParser {
     // TODO: Use the logger or get rid of it
     private static final Logger LOG = Logger.getLogger(JobParser.class);
 
-    public static JobList parseJobs(File jobFile) {
+    public static ArrayList<Job> parseJobs(File jobFile) {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
@@ -37,7 +33,7 @@ public class JobParser {
                 }
             }
 
-            JobList jobList = new JobList();
+            ArrayList<Job> jobList = new ArrayList();
 
             // per Job
             for (Element jobElement : jobs) {

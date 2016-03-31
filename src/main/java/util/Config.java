@@ -6,7 +6,7 @@ import java.io.File;
 import java.util.HashMap;
 
 /**
- * Created by Johannes on 29/02/16.
+ * Created by joh-mue on 29/02/16.
  */
 public class Config {
     private static Config instance;
@@ -36,8 +36,14 @@ public class Config {
         config = ConfigParser.parseConfig(configFile);
     }
 
-    // TODO: once all the parameters are know this should be made more precise
+    // TODO: [009a] once all the parameters are know this should be made more precise
     public String getConfigItem(String key) {
         return (String) config.get(key);
+    }
+
+    public static File getLogDir(String experimentName) {
+        // TODO: [009b]should not call getInstance but be static instead
+        String baseLogDir = Config.getInstance().getConfigItem("log-dir");
+        return new File(baseLogDir + '/' + experimentName);
     }
 }

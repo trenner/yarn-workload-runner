@@ -4,7 +4,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import util.JobTime;
+import util.JobFactory;
 import util.Schedule;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -13,11 +13,11 @@ import java.io.File;
 import java.util.ArrayList;
 
 /**
- * Created by Johannes on 03/02/16.
+ * Created by joh-mue on 03/02/16.
  */
 public class ScheduleParser {
 
-    public static ArrayList<Schedule> parseSchedule(File scheduleFile) {
+    public static ArrayList<Schedule> parseSchedule(File scheduleFile, JobFactory jobFactory) {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
@@ -38,7 +38,8 @@ public class ScheduleParser {
             ArrayList<Schedule> schedules = new ArrayList<>();
 
             for (Element experimentElement: experiments) {
-                Schedule experimentSchedule = new Schedule(experimentElement.getAttribute("name"));
+                String experimentName = experimentElement.getAttribute("name");
+                Schedule experimentSchedule = new Schedule(experimentName);
 
                 NodeList jobTimes = experimentElement.getChildNodes();
                 for (int i = 0; i < jobTimes.getLength(); i++){
@@ -46,7 +47,7 @@ public class ScheduleParser {
                     if (jobTime.getNodeType() == Node.ELEMENT_NODE) {
                         String jobName = jobTime.getAttributes().getNamedItem("name").getNodeValue();
                         Long delay = Long.parseLong(jobTime.getTextContent());
-                        experimentSchedule.add(new JobTime(jobName, delay));
+                        experimentSchedule.add(jobFactory.getJob(experimentSchedule.getExperimentName(), jobName, delay));
                     }
                 }
                 schedules.add(experimentSchedule);
