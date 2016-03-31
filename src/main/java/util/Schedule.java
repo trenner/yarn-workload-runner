@@ -1,11 +1,13 @@
 package util;
 
+import Core.Job;
+
 import java.util.ArrayList;
 
 /**
- * Created by Johannes on 09/02/16.
+ * Created by joh-mue on 09/02/16.
  */
-public class Schedule extends ArrayList<JobTime> {
+public class Schedule extends ArrayList<Job> {
     private String experimentName;
 
     public Schedule(String experimentName) {

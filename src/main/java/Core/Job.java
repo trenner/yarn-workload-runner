@@ -2,33 +2,91 @@ package Core;
 
 import Core.commandBuilder.CommandBuilder;
 
-import java.util.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.util.ArrayList;
 
 /**
- * Created by Johannes on 01/02/16.
+ * Created by joh-mue on 01/02/16.
  */
 public class Job {
 
-    protected String jarFile;
-    protected ArrayList<String> runnerArguments;
-    protected ArrayList<String> jarArguments;
-    protected CommandBuilder cmdBuilder;
-    protected String runner;
-    protected String jobName;
+    private String jarFile;
+    private ArrayList<String> runnerArguments;
+    private ArrayList<String> jarArguments;
+    private CommandBuilder cmdBuilder;
+    private String runner;
+    private String jobName;
+    private String experimentName;
+    private Integer duplicateNumber; // to make the logName unique
+    private Long delay;
+    private String JobID;
 
-    protected String JobID;
+    /* Constructors */
+
+    public Job(String jarFile, ArrayList<String> runnerArguments, ArrayList<String> jarArguments, CommandBuilder cmdBuilder,
+               String runner, String jobName, Integer duplicateNumber, Long delay, String experimentName) {
+        this.jarFile = jarFile;
+        this.runnerArguments = runnerArguments;
+        this.jarArguments = jarArguments;
+        this.cmdBuilder = cmdBuilder;
+        this.runner = runner;
+        this.jobName = jobName;
+        this.duplicateNumber = duplicateNumber;
+        this.delay = delay;
+        this.experimentName = experimentName;
+    }
 
     public Job() {
         // TODO: optimize default constructor
+        duplicateNumber = 0;
     }
 
-    public String getCommand() {
-        return cmdBuilder.getCommand(runnerArguments, jarFile, jarArguments);
+    /* functionality */
+
+    /**
+     * Returns appropriate, unique PrintStream in the log directory for this job.
+     *
+     * @param logDir the directory where the log should be created, usually per Config.getLogDir(Schedule experiment)
+     *
+     * @return PrintStream for this job or null in case of FileNotFoundException
+     */
+    public PrintStream getLogPrintStream(File logDir) {
+        final String logName = String.format("%s-%s+%s(%s).out", experimentName, jobName, delay, duplicateNumber);
+        File logFile = new File(logDir, logName);
+        try {
+            return new PrintStream(new FileOutputStream(logFile));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
-    private void setCmdBuilder(CommandBuilder cmdBuilder) {
-        this.cmdBuilder = cmdBuilder;
+    @Override
+    public String toString() {
+        return "Job{" +
+                "runner='" + runner + '\'' +
+                ", jobName='" + jobName + '\'' +
+                ", jarFile='" + jarFile + '\'' +
+                '}';
     }
+
+    /**
+     * Returns a copy form this prototype with different values for experimentName, jobName and delay
+     *
+     * @param experimentName
+     * @param jobName
+     * @param delay
+     * @return
+     */
+    public Job cloneAndSet(String experimentName, String jobName, long delay, Integer duplicateNumber) {
+        return new Job(jarFile, runnerArguments, jarArguments, cmdBuilder,
+                runner, jobName, duplicateNumber, delay, experimentName);
+    }
+
+    /* getter and setter */
 
     /**
      * Sets the runner and picks the appropriate CommandBuilder.
@@ -42,6 +100,10 @@ public class Job {
             System.out.println(e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    public String getCommand() {
+        return cmdBuilder.getCommand(runnerArguments, jarFile, jarArguments);
     }
 
     public void setRunnerArguments(ArrayList<String> runnerArguments) {
@@ -80,16 +142,15 @@ public class Job {
         return jobName;
     }
 
-    public void setJobName(String jobName) {
-        this.jobName = jobName;
+    public Long getDelay() {
+        return delay;
     }
 
-    @Override
-    public String toString() {
-        return "Job{" +
-                "runner='" + runner + '\'' +
-                ", jobName='" + jobName + '\'' +
-                ", jarFile='" + jarFile + '\'' +
-                '}';
+    public String getExperimentName() {
+        return experimentName;
+    }
+
+    public void setJobName(String jobName) {
+        this.jobName = jobName;
     }
 }

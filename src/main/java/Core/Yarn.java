@@ -1,50 +1,46 @@
 package Core;
 
 import util.Config;
-import util.JobList;
-import util.JobTime;
 import util.Schedule;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 
 /**
- * Created by Johannes on 01/02/16.
+ * Created by joh-mue on 01/02/16.
  *
  */
 public class Yarn {
     private Schedule schedule;
-    private JobList jobs;
 
-    public Yarn(Schedule schedule, JobList jobs) {
+    public Yarn(Schedule schedule) {
         this.schedule = schedule;
-        this.jobs = jobs;
     }
 
     public void runJobs() {
-        for (JobTime jobTime: schedule) {
-                Job job = jobs.getJobWithName(jobTime.getJobName());
-                (new Thread(new JobRunner(job, jobTime))).start();
+        for (Job job: schedule) {
+                (new Thread(new JobRunner(job))).start();
         }
     }
 
     private class JobRunner implements Runnable {
 
         private Job job;
-        private JobTime jobTime;
 
-        public JobRunner(Job job, JobTime jobTime) {
+        public JobRunner(Job job) {
             this.job = job;
-            this.jobTime = jobTime;
         }
 
         public void run() {
             try {
-                System.out.println("Waiting " + jobTime.getDelay() + " to execute " + jobTime.getJobName());
-                Thread.sleep(jobTime.getDelay() * 1000,0);
+                System.out.println("Waiting " + job.getDelay() + " to execute " + job.getJobName());
+                Thread.sleep(job.getDelay() * 1000,0);
 
-                PrintStream out = createLogPrintStream();
+                PrintStream out = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
 
-                System.out.println("Executing " + job + '+' + jobTime.getDelay() + "sec with command: " + job.getCommand());
+                System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
                 InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
                 BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -63,7 +59,7 @@ public class Yarn {
                     if (line.contains("Job execution switched to status FINISHED")) {
                         long endTime = System.nanoTime();
                         long duration = (endTime - startTime);
-                        System.out.println("Executing " + job + '+' + jobTime.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
+                        System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
                     }
                 }
                 // TODO: create experiment summary file/output
@@ -72,23 +68,6 @@ public class Yarn {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }
-
-        private PrintStream createLogPrintStream() {
-
-            String logDir = Config.getInstance().getConfigItem("log-dir") + '/' + schedule.getExperimentName();
-            String logFileName = schedule.getExperimentName() + '-' + job.getJobName() + "+" + jobTime.getDelay();
-
-            File experimentLogDir = new File(logDir);
-            experimentLogDir.mkdirs(); // create directories if necessary
-
-            try {
-                return new PrintStream(new FileOutputStream(logDir + '/' + logFileName));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
-            return null;
         }
     }
 }
