@@ -46,4 +46,13 @@ public class Config {
         String baseLogDir = Config.getInstance().getConfigItem("log-dir");
         return new File(baseLogDir + '/' + experimentName);
     }
+
+    /**
+     * Returns true if sequential execution is wanted false otherwise. Start delays will be relative
+     * to the last job that was submitted.
+     * @return boolean indicating if sequential execution is desired
+     */
+    public boolean sequentialExecution() {
+        return getConfigItem("sequentialExecution").equalsIgnoreCase("true");
+    }
 }

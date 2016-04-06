@@ -3,6 +3,7 @@
 <config>
     <flink-home-dir>/Users/Johannes/arbeit/systems/flink-0.10.1</flink-home-dir>
     <log-dir>/Users/Johannes/arbeit/yarn-timed-workload-generator/logs</log-dir>
+    <sequentialExecution>false</sequentialExecution><!--set to "true" to activate-->
 
     <!--not supported right now-->
     <!--<jobs-xml-path>/Users/Johannes/arbeit/yarn-timed-workload-generator/src/main/resources/jobs.xml</jobs-xml-path>-->
