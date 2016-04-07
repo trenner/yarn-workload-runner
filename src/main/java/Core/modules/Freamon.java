@@ -1,20 +1,27 @@
 package Core.modules;
 
-import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
+import akka.actor.*;
+import com.typesafe.config.ConfigFactory;
 import util.Config;
 
 /**
  * Sends messages to the Freamon MonitorMasterActor
  */
-public class Freamon {
+public class Freamon extends UntypedActor {
 
-    private static final ActorRef freamonMaster = new UntypedActor() {
-        @Override
-        public void onReceive(Object message) throws Exception {
-            throw new RuntimeException("Received unexpected message " + message);
-        }
-    }.context().actorFor(Config.getInstance().getConfigItem("freamonMasterAddress"));
+    private static final com.typesafe.config.Config config = ConfigFactory
+        .parseString("akka.actor.provider = \"akka.remote.RemoteActorRefProvider\"\n" +
+        "akka.remote.enabled-transport = [\"akka.remote.netty.NettyRemoteTransport\"]")
+        .withFallback(ConfigFactory.load());
+    private static final ActorSystem actorSystem = ActorSystem.create("yarnWorkloadRunnerSystem", config);
+    private static final ActorRef instance = actorSystem.actorOf(Props.create(Freamon.class), "freamonSender");
+
+    private final ActorSelection freamonMaster = getContext().actorSelection(Config.getInstance().getConfigItem("freamonMasterAddress"));
+
+    @Override
+    public void onReceive(Object message) throws Exception {
+        freamonMaster.forward(message, getContext());
+    }
 
     public static class OnStart {
         public final String jobID;
@@ -40,10 +47,10 @@ public class Freamon {
     }
 
     public static void onStart(String jobID, long startTime) {
-        freamonMaster.tell(new OnStart(jobID, startTime), null);
+        instance.tell(new OnStart(jobID, startTime), instance);
     }
 
     public static void onStop(String jobID, long stopTime) {
-        freamonMaster.tell(new OnStop(jobID, stopTime), null);
+        instance.tell(new OnStop(jobID, stopTime), instance);
     }
 }
