@@ -1,5 +1,6 @@
 package Core;
 
+import Core.modules.Freamon;
 import util.Config;
 import util.Schedule;
 
@@ -63,16 +64,19 @@ public class Yarn {
                         if (line.contains("Submitted application")) {
                             String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
                             job.setJobID(jobID);
+                            Freamon.onSubmit(job.getJobID());
                         }
 
                         if (line.contains("Job execution switched to status RUNNING.")) {
                             startTime = System.nanoTime();
+                            Freamon.onStart(job.getJobID(), startTime);
                         }
 
                         if (line.contains("Job execution switched to status FINISHED")) {
                             long endTime = System.nanoTime();
                             long duration = (endTime - startTime);
                             System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
+                            Freamon.onStop(job.getJobID(), endTime);
                         }
                     }
                     // TODO: create experiment summary file/output
