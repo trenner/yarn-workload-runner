@@ -5,6 +5,8 @@
     <log-dir>/Users/Johannes/arbeit/yarn-timed-workload-generator/logs</log-dir>
     <sequentialExecution>false</sequentialExecution><!--set to "true" to activate-->
 
+    <freamonMasterAddress>akka.tcp://masterSystem@wally001.cit.tu-berlin.de:4512/user/monitorMaster</freamonMasterAddress>
+
     <!--not supported right now-->
     <!--<jobs-xml-path>/Users/Johannes/arbeit/yarn-timed-workload-generator/src/main/resources/jobs.xml</jobs-xml-path>-->
     <!--<schedule-xml-path>/Users/Johannes/arbeit/yarn-timed-workload-generator/src/main/resources/schedule.xml</schedule-xml-path>-->
