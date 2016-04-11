@@ -4,26 +4,47 @@ import akka.actor.*;
 import com.typesafe.config.ConfigFactory;
 import util.Config;
 
+import java.io.Serializable;
+
 /**
  * Sends messages to the Freamon MonitorMasterActor
  */
 public class Freamon extends UntypedActor {
 
-    private static final com.typesafe.config.Config config = ConfigFactory
-        .parseString("akka.actor.provider = \"akka.remote.RemoteActorRefProvider\"\n" +
-        "akka.remote.enabled-transport = [\"akka.remote.netty.NettyRemoteTransport\"]")
-        .withFallback(ConfigFactory.load());
-    private static final ActorSystem actorSystem = ActorSystem.create("yarnWorkloadRunnerSystem", config);
-    private static final ActorRef instance = actorSystem.actorOf(Props.create(Freamon.class), "freamonSender");
+    private static final ActorRef instance = getActor();
 
-    private final ActorSelection freamonMaster = getContext().actorSelection(Config.getInstance().getConfigItem("freamonMasterAddress"));
+    private static ActorRef getActor() {
+        // TODO pass application.conf path in config.xml
+        final com.typesafe.config.Config config = ConfigFactory
+            .parseString("akka.remote.netty.tcp.hostname=" + Config.getInstance().getConfigItem("akkaHost")
+                    + "\nakka.remote.netty.tcp.port=" + Config.getInstance().getConfigItem("akkaPort"))
+            .withFallback(ConfigFactory.load());
+
+        final ActorSystem actorSystem = ActorSystem.create("yarnWorkloadRunnerSystem", config);
+
+        return actorSystem.actorOf(Props.create(Freamon.class), "freamonSender");
+    }
+
+    private final ActorSelection freamonMaster = getFreamonMasterActor();
+
+    private ActorSelection getFreamonMasterActor() {
+        final Address masterSystemPath = new Address("akka.tcp",
+            Config.getInstance().getConfigItem("freamonMasterSystemName"),
+            Config.getInstance().getConfigItem("freamonMasterHost"),
+            Integer.parseInt(Config.getInstance().getConfigItem("freamonMasterPort")));
+
+        final String masterActorPath = masterSystemPath.toString() + "/user/"
+            + Config.getInstance().getConfigItem("freamonMasterActorName");
+
+        return getContext().actorSelection(masterActorPath);
+    }
 
     @Override
     public void onReceive(Object message) throws Exception {
         freamonMaster.forward(message, getContext());
     }
 
-    public static class OnStart {
+    public static class OnStart implements Serializable {
         public final String jobID;
         public final long startTime;
 
@@ -33,7 +54,7 @@ public class Freamon extends UntypedActor {
         }
     }
 
-    public static class OnStop {
+    public static class OnStop implements Serializable {
         public final String jobID;
         public final long stopTime;
 
@@ -44,6 +65,7 @@ public class Freamon extends UntypedActor {
     }
 
     public static void onSubmit(String jobID) {
+        // we could use this to add not-yet-started jobs to the db
     }
 
     public static void onStart(String jobID, long startTime) {

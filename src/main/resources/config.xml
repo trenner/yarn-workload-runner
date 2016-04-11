@@ -8,5 +8,10 @@
     <overwriteLogs>false</overwriteLogs>
 
     <notifyFreamon>false</notifyFreamon>
-    <freamonMasterAddress>akka.tcp://masterSystem@wally001.cit.tu-berlin.de:4512/user/monitorMaster</freamonMasterAddress>
+    <akkaHost>cluster01.example.com</akkaHost>
+    <akkaPort>1234</akkaPort>
+    <freamonMasterHost>cluster01.example.com</freamonMasterHost>
+    <freamonMasterPort>1235</freamonMasterPort>
+    <freamonMasterSystemName>masterSystem</freamonMasterSystemName>
+    <freamonMasterActorName>monitorMaster</freamonMasterActorName>
 </config>
