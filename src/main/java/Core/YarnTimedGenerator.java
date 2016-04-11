@@ -44,13 +44,16 @@ public class YarnTimedGenerator {
             // TODO: only usage of Schedule class,if this is replaced, schedule class is no longer needed
             File expLogDir = Config.getLogDir(expScheduleIterator.next().getExperimentName());
             if (expLogDir.exists()) {
-                System.out.println("Log directory " + expLogDir +
-                        " already exists. Move or delete those logs first," +
-                        " or change the log directory in your config.xml");
-                System.exit(1);
-            } else {
-                expLogDir.mkdirs();
+                if (Config.getInstance().overwriteLogs()) {
+                    expLogDir.delete();
+                } else {
+                    System.out.println("Log directory " + expLogDir +
+                            " already exists. Move or delete those logs first," +
+                            " or change the log directory in your config.xml");
+                    System.exit(1);
+                }
             }
+            expLogDir.mkdirs();
         }
     }
 }

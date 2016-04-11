@@ -41,6 +41,10 @@ public class Config {
         return (String) config.get(key);
     }
 
+    private boolean getBooleanConfigItem(String key) {
+        return getConfigItem(key).equalsIgnoreCase("true");
+    }
+
     public static File getLogDir(String experimentName) {
         // TODO: [009b]should not call getInstance but be static instead
         String baseLogDir = Config.getInstance().getConfigItem("log-dir");
@@ -53,6 +57,22 @@ public class Config {
      * @return boolean indicating if sequential execution is desired
      */
     public boolean sequentialExecution() {
-        return getConfigItem("sequentialExecution").equalsIgnoreCase("true");
+        return getBooleanConfigItem("sequentialExecution");
+    }
+
+    /**
+     * Returns true if logs should be overwritten if they already exist for any given job
+     * @return boolean indicating if logs should be overwriten
+     */
+    public boolean overwriteLogs() {
+        return getBooleanConfigItem("overwriteLogs");
+    }
+
+    /**
+     * Returns true if freamon functionality should be executed
+     * @return
+     */
+    public boolean notifyFreamon() {
+        return getBooleanConfigItem("notifyFreamon");
     }
 }

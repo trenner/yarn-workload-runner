@@ -25,13 +25,13 @@ public class Yarn {
             Thread jobThread = new Thread(new JobRunner(job));
             jobThread.start();
 
-            synchronized (jobThread) {
-                try {
-                    if (Config.getInstance().sequentialExecution()) {
-                        jobThread.wait();
+            if (Config.getInstance().sequentialExecution()) {
+                synchronized (jobThread) {
+                    try {
+                            jobThread.wait();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
             }
         }
@@ -48,6 +48,8 @@ public class Yarn {
         public void run() {
             synchronized (this) {
                 try {
+                    Config config = Config.getInstance();
+
                     System.out.println("Waiting " + job.getDelay() + " to execute " + job.getJobName());
                     Thread.sleep(job.getDelay() * 1000, 0);
 
@@ -64,19 +66,25 @@ public class Yarn {
                         if (line.contains("Submitted application")) {
                             String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
                             job.setJobID(jobID);
-                            Freamon.onSubmit(job.getJobID());
+                            if (config.notifyFreamon()) {
+                                Freamon.onSubmit(job.getJobID());
+                            }
                         }
 
                         if (line.contains("Job execution switched to status RUNNING.")) {
                             startTime = System.nanoTime();
-                            Freamon.onStart(job.getJobID(), startTime);
+                            if (config.notifyFreamon()) {
+                                Freamon.onStart(job.getJobID(), startTime);
+                            }
                         }
 
                         if (line.contains("Job execution switched to status FINISHED")) {
                             long endTime = System.nanoTime();
                             long duration = (endTime - startTime);
                             System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
-                            Freamon.onStop(job.getJobID(), endTime);
+                            if (config.notifyFreamon()) {
+                                Freamon.onStop(job.getJobID(), endTime);
+                            }
                         }
                     }
                     // TODO: create experiment summary file/output

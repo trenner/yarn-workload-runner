@@ -3,8 +3,11 @@
 <config>
     <flink-home-dir>/Users/Johannes/arbeit/systems/flink-0.10.1</flink-home-dir>
     <log-dir>/Users/Johannes/arbeit/yarn-timed-workload-generator/logs</log-dir>
-    <sequentialExecution>false</sequentialExecution><!--set to "true" to activate-->
 
+    <sequentialExecution>false</sequentialExecution><!--set to "true" to execute jobs sequentially-->
+    <overwriteLogs>false</overwriteLogs>
+
+    <notifyFreamon>false</notifyFreamon>
     <freamonMasterAddress>akka.tcp://masterSystem@wally001.cit.tu-berlin.de:4512/user/monitorMaster</freamonMasterAddress>
 
     <!--not supported right now-->
