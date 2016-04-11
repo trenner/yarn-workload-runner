@@ -45,7 +45,7 @@ public class YarnTimedGenerator {
             File expLogDir = Config.getLogDir(expScheduleIterator.next().getExperimentName());
             if (expLogDir.exists()) {
                 if (Config.getInstance().overwriteLogs()) {
-                    expLogDir.delete();
+                    delete(expLogDir);
                 } else {
                     System.out.println("Log directory " + expLogDir +
                             " already exists. Move or delete those logs first," +
@@ -55,5 +55,23 @@ public class YarnTimedGenerator {
             }
             expLogDir.mkdirs();
         }
+    }
+
+    /**
+     * Delete all files (not directories) in this directory and the directory itself if it is empty. If the directory
+     * contains any folders the directory and the contained folders will remain. All filles in the dir will be deleted though.
+     * @param dir
+     * @return
+     */
+    private static boolean delete(File dir) {
+        File[] files = dir.listFiles();
+        if (files != null) {
+            for (File file: files) {
+                file.delete();
+            }
+        }
+        boolean deleted = dir.delete();
+        System.out.println("Existing logs in " + dir + " deleted: " + deleted);
+        return deleted;
     }
 }
