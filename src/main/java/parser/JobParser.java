@@ -53,9 +53,8 @@ public class JobParser {
             return jobList;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
-        // TODO: refactor, this should never be reached, thus not necessary
-        return null;
     }
 
     private static void parseRunnerInfo(Node runnerNode, Job job) {

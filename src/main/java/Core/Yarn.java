@@ -20,15 +20,15 @@ public class Yarn {
         this.schedule = schedule;
     }
 
-    public void runJobs() {
-        for (Job job: schedule) {
-            Thread jobThread = new Thread(new JobRunner(job));
+    public void initiateJobExecution() {
+        for (JobSequence jobSequence: schedule) {
+            Thread jobThread = new Thread(new JobRunner(jobSequence));
             jobThread.start();
 
             if (Config.getInstance().sequentialExecution()) {
                 synchronized (jobThread) {
                     try {
-                            jobThread.wait();
+                        jobThread.wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -38,61 +38,66 @@ public class Yarn {
     }
 
     private class JobRunner implements Runnable {
+        private JobSequence jobSequence;
 
-        private Job job;
-
-        public JobRunner(Job job) {
-            this.job = job;
+        public JobRunner(JobSequence jobSequence) {
+            this.jobSequence = jobSequence;
         }
 
         public void run() {
             synchronized (this) {
-                try {
-                    Config config = Config.getInstance();
+                for (Job job: jobSequence) {
+                    executeJob(job);
+                }
+            }
+        }
 
-                    System.out.println("Waiting " + job.getDelay() + " to execute " + job.getJobName());
-                    Thread.sleep(job.getDelay() * 1000, 0);
+        private void executeJob(Job job) {
+            try {
+                Config config = Config.getInstance();
 
-                    PrintStream out = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
+                System.out.println("Waiting " + job.getDelay() + " to execute " + job.getJobName());
+                Thread.sleep(job.getDelay() * 1000, 0);
 
-                    System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
-                    InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
-                    BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
+                PrintStream out = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
 
-                    String line;
-                    long startTime = 0;
-                    while ((line = buff.readLine()) != null) {
-                        out.println(line);
-                        if (line.contains("Submitted application")) {
-                            String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
-                            job.setJobID(jobID);
-                            if (config.notifyFreamon()) {
-                                Freamon.onSubmit(job.getJobID());
-                            }
-                        }
+                System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
+                InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
+                BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
 
-                        if (line.contains("Job execution switched to status RUNNING.")) {
-                            startTime = System.nanoTime();
-                            if (config.notifyFreamon()) {
-                                Freamon.onStart(job.getJobID(), startTime);
-                            }
-                        }
-
-                        if (line.contains("Job execution switched to status FINISHED")) {
-                            long endTime = System.nanoTime();
-                            long duration = (endTime - startTime);
-                            System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
-                            if (config.notifyFreamon()) {
-                                Freamon.onStop(job.getJobID(), endTime);
-                            }
+                String line;
+                long startTime = 0;
+                while ((line = buff.readLine()) != null) {
+                    out.println(line);
+                    if (line.contains("Submitted application")) {
+                        String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
+                        job.setJobID(jobID);
+                        if (config.notifyFreamon()) {
+                            Freamon.onSubmit(job.getJobID());
                         }
                     }
-                    // TODO: create experiment summary file/output
-                    out.flush();
-                    out.close();
-                } catch (Exception e) {
-                    e.printStackTrace();
+
+                    if (line.contains("Job execution switched to status RUNNING.")) {
+                        startTime = System.nanoTime();
+                        if (config.notifyFreamon()) {
+                            Freamon.onStart(job.getJobID(), startTime);
+                        }
+                    }
+
+                    if (line.contains("Job execution switched to status FINISHED")) {
+                        long endTime = System.nanoTime();
+                        long duration = (endTime - startTime);
+                        System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
+                        if (config.notifyFreamon()) {
+                            Freamon.onStop(job.getJobID(), endTime);
+                        }
+                    }
                 }
+                // TODO: create experiment summary file/output
+                out.flush();
+                out.close();
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
     }

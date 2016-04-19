@@ -34,7 +34,7 @@ public class YarnTimedGenerator {
         Iterator<Schedule> experimentScheduleIterator = experimentSchedules.iterator();
         while (experimentScheduleIterator.hasNext()) {
             Yarn yarn = new Yarn(experimentScheduleIterator.next());
-            yarn.runJobs();
+            yarn.initiateJobExecution();
             // TODO: wait until the last experiment finished before starting the next one
         }
     }

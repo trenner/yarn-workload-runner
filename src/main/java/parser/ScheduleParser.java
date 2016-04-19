@@ -1,5 +1,6 @@
 package parser;
 
+import Core.JobSequence;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -24,10 +25,9 @@ public class ScheduleParser {
             Document doc = documentBuilder.parse(scheduleFile);
             doc.getDocumentElement().normalize();
 
-            NodeList experimentNodeList = doc.getElementsByTagName("experiment");
-
             ArrayList<Element> experiments = new ArrayList<>();
 
+            NodeList experimentNodeList = doc.getElementsByTagName("experiment");
             for (int i = 0; i < experimentNodeList.getLength(); i++) {
                 Node node = experimentNodeList.item(i);
                 if (node.getNodeType() == Node.ELEMENT_NODE) {
@@ -38,26 +38,54 @@ public class ScheduleParser {
             ArrayList<Schedule> schedules = new ArrayList<>();
 
             for (Element experimentElement: experiments) {
-                String experimentName = experimentElement.getAttribute("name");
-                Schedule experimentSchedule = new Schedule(experimentName);
+                String expName = experimentElement.getAttribute("name");
+                Schedule experimentSchedule = new Schedule(expName);
 
-                NodeList jobTimes = experimentElement.getChildNodes();
-                for (int i = 0; i < jobTimes.getLength(); i++){
-                    Node jobTime = jobTimes.item(i);
-                    if (jobTime.getNodeType() == Node.ELEMENT_NODE) {
-                        String jobName = jobTime.getAttributes().getNamedItem("name").getNodeValue();
-                        Long delay = Long.parseLong(jobTime.getTextContent());
-                        experimentSchedule.add(jobFactory.getJob(experimentSchedule.getExperimentName(), jobName, delay));
+                for (Node node: getChildIterable(experimentElement)) {
+                    if (node.getNodeName().equalsIgnoreCase("job-sequence")) {
+                        JobSequence jobSequence = new JobSequence();
+                        getChildIterable(node).forEach(childNode -> parseJob(childNode, jobSequence, jobFactory, expName));
+                        experimentSchedule.add(jobSequence);
+                    } else { // element is a plain job -> jobSequence with one job in it
+                        JobSequence jobSequence = new JobSequence();
+                        parseJob(node, jobSequence, jobFactory, expName);
+                        experimentSchedule.add(jobSequence);
                     }
                 }
+
                 schedules.add(experimentSchedule);
             }
             // per experiment
             return schedules;
         } catch (Exception e) {
             e.printStackTrace();
+            return null;
         }
+    }
 
-        return null;
+    private static void parseJob(Node jobNode, JobSequence jobSequence, JobFactory jobFactory, String expName) {
+        String jobName = jobNode.getAttributes().getNamedItem("name").getNodeValue();
+        Long delay = Long.parseLong(jobNode.getTextContent());
+        // TODO: parse and overrite jobInfo
+        jobSequence.add(
+                jobFactory.getJob(expName, jobName, delay));
+    }
+
+    /**
+     * Returns an
+     * @param parentNode
+     * @return
+     */
+    private static ArrayList<Node> getChildIterable(Node parentNode) {
+        ArrayList<Node> childList = new ArrayList<>();
+
+        NodeList nodeList = parentNode.getChildNodes();
+        for (int i = 0; i < nodeList.getLength(); i++) {
+            Node node = nodeList.item(i);
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                childList.add(node);
+            }
+        }
+        return childList;
     }
 }
