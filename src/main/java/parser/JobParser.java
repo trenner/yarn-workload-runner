@@ -57,6 +57,21 @@ public class JobParser {
         }
     }
 
+    public static void overwriteJobInfo(Node jobNode, Job job) {
+        Element jobElement = (Element) jobNode;
+
+        // Get Runner and parameters
+        Node runnerNode = jobElement.getElementsByTagName("runner").item(0);
+        if (runnerNode != null) {
+//            parseRunnerInfo(runnerNode, job);
+        }
+
+        Node jarNode = jobElement.getElementsByTagName("jar").item(0);
+        if (jarNode != null) {
+//            parseJarInfo(jarNode, job);
+        }
+    }
+
     private static void parseRunnerInfo(Node runnerNode, Job job) {
         NodeList runnerChildNodes = runnerNode.getChildNodes();
         for (int i = 0; i < runnerChildNodes.getLength(); i++) {

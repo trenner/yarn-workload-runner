@@ -1,5 +1,6 @@
 package parser;
 
+import Core.Job;
 import Core.JobSequence;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,10 +66,26 @@ public class ScheduleParser {
 
     private static void parseJob(Node jobNode, JobSequence jobSequence, JobFactory jobFactory, String expName) {
         String jobName = jobNode.getAttributes().getNamedItem("name").getNodeValue();
-        Long delay = Long.parseLong(jobNode.getTextContent());
-        // TODO: parse and overrite jobInfo
-        jobSequence.add(
-                jobFactory.getJob(expName, jobName, delay));
+
+        Job job;
+        if (jobNode.getTextContent().isEmpty()) { // no value defaults to 0
+            Long delay = new Long(0);
+
+            Node delayNode = ((Element) jobNode).getElementsByTagName("delay").item(0);
+            if (delayNode != null) {
+                delay = Long.parseLong(delayNode.getTextContent());
+            }
+
+            // TODO: this could be simplified and combined into the jobfactory?
+            job = jobFactory.getJob(expName, jobName, delay);
+            JobParser.overwriteJobInfo(jobNode, job);
+
+        } else {
+            Long delay = Long.parseLong(jobNode.getTextContent());
+            job = jobFactory.getJob(expName, jobName, delay);
+        }
+
+        jobSequence.add(job);
     }
 
     /**
@@ -76,7 +93,7 @@ public class ScheduleParser {
      * @param parentNode
      * @return
      */
-    private static ArrayList<Node> getChildIterable(Node parentNode) {
+    private static Iterable<Node> getChildIterable(Node parentNode) {
         ArrayList<Node> childList = new ArrayList<>();
 
         NodeList nodeList = parentNode.getChildNodes();
