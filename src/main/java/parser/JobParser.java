@@ -4,6 +4,7 @@ package parser;
 import Core.Job;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
+import util.Tuple3;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -57,22 +58,7 @@ public class JobParser {
         }
     }
 
-    public static void overwriteJobInfo(Node jobNode, Job job) {
-        Element jobElement = (Element) jobNode;
-
-        // Get Runner and parameters
-        Node runnerNode = jobElement.getElementsByTagName("runner").item(0);
-        if (runnerNode != null) {
-//            parseRunnerInfo(runnerNode, job);
-        }
-
-        Node jarNode = jobElement.getElementsByTagName("jar").item(0);
-        if (jarNode != null) {
-//            parseJarInfo(jarNode, job);
-        }
-    }
-
-    private static void parseRunnerInfo(Node runnerNode, Job job) {
+    public static void parseRunnerInfo(Node runnerNode, Job job) {
         NodeList runnerChildNodes = runnerNode.getChildNodes();
         for (int i = 0; i < runnerChildNodes.getLength(); i++) {
             Node item = runnerChildNodes.item(i);
@@ -81,14 +67,15 @@ public class JobParser {
                     job.setRunner(item.getTextContent());
                     break;
                 case "arguments":
-                    job.setRunnerArguments(getArguments(item , "-"));
+//                    job.setRunnerArguments(getArguments(item , "-"));
+                    job.setOrOverwriteRunnerArguments(getArguments(item, "-"));
                     break;
             }
 
         }
     }
 
-    private static void parseJarInfo(Node jarNode, Job job) {
+    public static void parseJarInfo(Node jarNode, Job job) {
         // get jar path
         NodeList jarChildNodes = jarNode.getChildNodes();
         for (int i = 0; i < jarChildNodes.getLength(); i++) {
@@ -98,14 +85,15 @@ public class JobParser {
                     job.setJarFile(item.getTextContent());
                     break;
                 case "arguments":
-                    job.setJarArguments(getArguments(item, ""));
+//                    job.setJarArguments(getArguments(item, ""));
+                    job.setOrOverwriteJarArguments(getArguments(item, ""));
                     break;
             }
         }
     }
 
-    private static ArrayList<String> getArguments(Node node, String separator) {
-        ArrayList<String> argumentList = new ArrayList<>();
+    private static ArrayList<Tuple3> getArguments(Node node, String prefix) {
+        ArrayList<Tuple3> argumentList = new ArrayList<>();
 
         NodeList arguments = node.getChildNodes();
         for (int i = 0; i < arguments.getLength(); i++) {
@@ -114,9 +102,9 @@ public class JobParser {
                 String parameterName = ""; // there might not be a name for the argument
                 NamedNodeMap attributes = argument.getAttributes();
                 if (attributes.getLength() != 0) {
-                    parameterName = separator + argument.getAttributes().item(0).getNodeValue();
+                    parameterName = argument.getAttributes().item(0).getNodeValue();
                 }
-                argumentList.add(parameterName + " " + argument.getTextContent());
+                argumentList.add(new Tuple3(parameterName, prefix, argument.getTextContent()));
             }
         }
         return argumentList;

@@ -2,15 +2,23 @@
 
 <suite>
  <experiment name="mixed experiment">
-     <job name="wordcount"></job>
+     <job name="wordcount">200</job>
      <job name="wordcount">5000</job>
      <job name="wordcount">5000</job>
      <job-sequence>
-         <job name="k-means"></job>
-         <job name="k-means">
-             <delay>0</delay>
+         <job name="kmeans">
+             <runner>
+                 <arguments>
+                    <argument name="key">Schabubblebuble</argument>
+                    <argument name="m">duggleduggel</argument>
+                 </arguments>
+             </runner>
+             <delay>100</delay>
          </job>
-         <job name="k-means">0</job>
+         <job name="kmeans">
+             <delay>1</delay>
+         </job>
+         <job name="kmeans">2</job>
      </job-sequence>
  </experiment>
 </suite>

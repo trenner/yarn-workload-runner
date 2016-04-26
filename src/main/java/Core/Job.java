@@ -1,6 +1,7 @@
 package Core;
 
 import Core.commandBuilder.CommandBuilder;
+import util.Tuple3;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
 public class Job {
 
     private String jarFile;
-    private ArrayList<String> runnerArguments;
-    private ArrayList<String> jarArguments;
+    private ArrayList<Tuple3> runnerArguments;
+    private ArrayList<Tuple3> jarArguments;
     private CommandBuilder cmdBuilder;
     private String runner;
     private String jobName;
@@ -26,7 +27,7 @@ public class Job {
 
     /* Constructors */
 
-    public Job(String jarFile, ArrayList<String> runnerArguments, ArrayList<String> jarArguments, CommandBuilder cmdBuilder,
+    public Job(String jarFile, ArrayList<Tuple3> runnerArguments, ArrayList<Tuple3> jarArguments, CommandBuilder cmdBuilder,
                String runner, String jobName, Integer duplicateNumber, Long delay, String experimentName) {
         this.jarFile = jarFile;
         this.runnerArguments = runnerArguments;
@@ -42,6 +43,8 @@ public class Job {
     public Job() {
         // TODO: optimize default constructor
         duplicateNumber = 0;
+        this.runnerArguments = new ArrayList<>();
+        this.jarArguments = new ArrayList<>();
     }
 
     /* functionality */
@@ -106,19 +109,82 @@ public class Job {
         return cmdBuilder.getCommand(runnerArguments, jarFile, jarArguments);
     }
 
-    public void setRunnerArguments(ArrayList<String> runnerArguments) {
+    private void setArgument(String value, ArrayList<Tuple3> arguments) {
+        setArgument("", value, arguments);
+    }
+
+    private void setArgument(String key, String value, ArrayList<Tuple3> arguments) {
+        if (key.isEmpty()) {
+            arguments.add(new Tuple3(key, "", value));
+        } else {
+            for (Tuple3 tuple : arguments) {
+                if (tuple.getKey().equalsIgnoreCase(key)) {
+                    tuple.setValue(value);
+                }
+            }
+        }
+    }
+
+    private void setOrOverwriteArguments(ArrayList<Tuple3> arguments, ArrayList<Tuple3> newArguments) {
+        if (arguments.isEmpty()) {
+            arguments.addAll(newArguments);
+        } else {
+            ArrayList<Tuple3> argumentsToAdd = new ArrayList<>();
+            for (Tuple3 newTuple: newArguments) {
+                if (newTuple.getKey().isEmpty()) {
+                    arguments.add(newTuple);
+                } else {
+                    for (Tuple3 tuple: arguments) {
+                        if (tuple.getKey().equalsIgnoreCase(newTuple.getKey())) {
+                            tuple.setValue(newTuple.getValue());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Sets or overwrites the argument with given key. Arguments without key cannot be overwritten, instead they will
+     * be added to the list of arguments.
+     * @param key - argument to be overwritten.
+     * @param value
+     */
+    public void setRunnerArgument(String key, String value) {
+        setArgument(key, value, runnerArguments);
+    }
+
+    public void setRunnerArguments(ArrayList<Tuple3> runnerArguments) {
         this.runnerArguments = runnerArguments;
     }
 
-    public ArrayList<String> getRunnerArguments() {
+    public void setOrOverwriteRunnerArguments(ArrayList<Tuple3> newArguments) {
+        setOrOverwriteArguments(runnerArguments, newArguments);
+    }
+
+    public ArrayList<Tuple3> getRunnerArguments() {
         return runnerArguments;
     }
 
-    public void setJarArguments(ArrayList<String> jarArguments) {
+    /**
+     * Sets or overwrites all arguments with given key. Arguments without key cannot be overwritten, instead they will
+     * simply be added to the list of arguments.
+     * @param key - argument to be overwritten.
+     * @param value
+     */
+    public void setJarArgument(String key, String value) {
+        setArgument(key, value, jarArguments);
+    }
+
+    public void setJarArguments(ArrayList<Tuple3> jarArguments) {
         this.jarArguments = jarArguments;
     }
 
-    public ArrayList<String> getJarArguments() {
+    public void setOrOverwriteJarArguments(ArrayList<Tuple3> newArguments) {
+        setOrOverwriteArguments(jarArguments, newArguments);
+    }
+
+    public ArrayList<Tuple3> getJarArguments() {
         return jarArguments;
     }
 

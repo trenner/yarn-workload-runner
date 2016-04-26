@@ -68,7 +68,8 @@ public class ScheduleParser {
         String jobName = jobNode.getAttributes().getNamedItem("name").getNodeValue();
 
         Job job;
-        if (jobNode.getTextContent().isEmpty()) { // no value defaults to 0
+        String textContent = jobNode.getTextContent();
+        if (jobNode.getTextContent().isEmpty() || jobNode.getTextContent().startsWith("\n")) { // no value defaults to 0
             Long delay = new Long(0);
 
             Node delayNode = ((Element) jobNode).getElementsByTagName("delay").item(0);
@@ -76,9 +77,9 @@ public class ScheduleParser {
                 delay = Long.parseLong(delayNode.getTextContent());
             }
 
-            // TODO: this could be simplified and combined into the jobfactory?
+            // TODO: maybe this could be simplified and combined into JobFactory?
             job = jobFactory.getJob(expName, jobName, delay);
-            JobParser.overwriteJobInfo(jobNode, job);
+            overwriteJobInfo(jobNode, job);
 
         } else {
             Long delay = Long.parseLong(jobNode.getTextContent());
@@ -86,6 +87,21 @@ public class ScheduleParser {
         }
 
         jobSequence.add(job);
+    }
+
+    private static void overwriteJobInfo(Node jobNode, Job job) {
+        Element jobElement = (Element) jobNode;
+
+        // Get Runner and parameters
+        Node runnerNode = jobElement.getElementsByTagName("runner").item(0);
+        if (runnerNode != null) {
+            JobParser.parseRunnerInfo(runnerNode, job);
+        }
+
+        Node jarNode = jobElement.getElementsByTagName("jar").item(0);
+        if (jarNode != null) {
+            JobParser.parseJarInfo(jarNode, job);
+        }
     }
 
     /**
