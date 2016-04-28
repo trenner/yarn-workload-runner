@@ -63,5 +63,5 @@ the locations of the above files must be stated as arguments in the correct orde
 
 ```
 mvn clean install
-java -jar target/YarnTimer-1.0-SNAPSHOT.jar src/main/resources/jobs.xml src/main/resources/schedule.xml src/main/resources/config.xml
+java -jar target/YarnWorkloadRunner-1.0-SNAPSHOT-jar-with-dependencies.jar src/main/resources/jobs.xml src/main/resources/schedule.xml src/main/resources/config.xml
 ```
