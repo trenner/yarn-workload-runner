@@ -80,16 +80,16 @@ public class Yarn {
                     }
 
                     if (line.contains("Job execution switched to status RUNNING.")) {
-                        startTime = System.nanoTime();
+                        startTime = System.currentTimeMillis();
                         if (config.notifyFreamon()) {
                             Freamon.onStart(job.getJobID(), startTime);
                         }
                     }
 
                     if (line.contains("Job execution switched to status FINISHED")) {
-                        long endTime = System.nanoTime();
+                        long endTime = System.currentTimeMillis();
                         long duration = (endTime - startTime);
-                        System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000000000 + " seconds to complete.");
+                        System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000 + " seconds to complete.");
                         if (config.notifyFreamon()) {
                             Freamon.onStop(job.getJobID(), endTime);
                         }
