@@ -74,6 +74,7 @@ public class Yarn {
                     if (line.contains("Submitted application")) {
                         String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
                         job.setJobID(jobID);
+                        System.out.println("Submitted " + job + '+' + job.getDelay() + "sec as " + jobID);
                         if (config.notifyFreamon()) {
                             Freamon.onSubmit(job.getJobID());
                         }
