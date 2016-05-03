@@ -51,6 +51,8 @@ public class Config {
         return new File(baseLogDir + '/' + experimentName);
     }
 
+    public String getHadoopConfDir() { return getConfigItem("hadoop-donf-dir"); }
+
     /**
      * Returns true if sequential execution is wanted false otherwise. Start delays will be relative
      * to the last job that was submitted.

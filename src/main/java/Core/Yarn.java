@@ -61,8 +61,10 @@ public class Yarn {
 
                 PrintStream out = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
 
+                String[] envp = { "HADOOP_CONF_DIR=" + config.getHadoopHome() };
+
                 System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
-                InputStream inputStream = Runtime.getRuntime().exec(job.getCommand()).getInputStream();
+                InputStream inputStream = Runtime.getRuntime().exec(job.getCommand(),envp).getInputStream();
                 BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
 
                 String line;

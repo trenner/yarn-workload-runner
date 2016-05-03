@@ -9,7 +9,7 @@ The YarnTimer.jar takes three arguments in the following order:
 
 YarnTimer.jar JOB_FILE SCHEDULE_FILE CONFIG_FILE
 
-Also make sure that the environment variable HADOOP_CONF_DIR is appropriately set to ```path/to/hadoop-2.x.x/etc/hadoop/```
+Also make sure that the environment variable HADOOP_CONF_DIR is appropriately set to ```path/to/hadoop-2.x.x/etc/hadoop/``` in your config.xml
 
 ## Instructions
 
