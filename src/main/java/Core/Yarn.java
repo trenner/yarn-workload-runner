@@ -80,14 +80,14 @@ public class Yarn {
                         }
                     }
 
-                    if (line.contains("Job execution switched to status RUNNING.")) {
+                    if (line.contains("All TaskManagers are connected")) {
                         startTime = System.currentTimeMillis();
                         if (config.notifyFreamon()) {
                             Freamon.onStart(job.getJobID(), startTime);
                         }
                     }
 
-                    if (line.contains("Job execution switched to status FINISHED")) {
+                    if (line.contains("The following messages were created by the YARN cluster while running the Job:")) {
                         long endTime = System.currentTimeMillis();
                         long duration = (endTime - startTime);
                         System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000 + " seconds to complete.");
