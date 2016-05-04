@@ -59,18 +59,21 @@ public class Yarn {
                 System.out.println("Waiting " + job.getDelay() + " to execute " + job.getJobName());
                 Thread.sleep(job.getDelay() * 1000, 0);
 
-                PrintStream out = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
+                PrintStream logPrintStream = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
 
                 String[] envp = { "HADOOP_CONF_DIR=" + config.getHadoopConfDir() };
 
                 System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
-                InputStream inputStream = Runtime.getRuntime().exec(job.getCommand(),envp).getInputStream();
+                Process process = Runtime.getRuntime().exec(job.getCommand(),envp);
+                InputStream inputStream = process.getInputStream();
+                InputStream errorStream = process.getErrorStream();
                 BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
+                BufferedReader buffErr = new BufferedReader(new InputStreamReader(errorStream));
 
                 String line;
                 long startTime = 0;
                 while ((line = buff.readLine()) != null) {
-                    out.println(line);
+                    logPrintStream.println(line);
                     if (line.contains("Submitted application")) {
                         String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
                         job.setJobID(jobID);
@@ -90,15 +93,18 @@ public class Yarn {
                     if (line.contains("The following messages were created by the YARN cluster while running the Job:")) {
                         long endTime = System.currentTimeMillis();
                         long duration = (endTime - startTime);
-                        System.out.println("Executing " + job + '+' + job.getDelay() + "sec took " + duration / 1000 + " seconds to complete.");
+                        System.out.println("Took " + duration / 1000
+                            + " seconds to complete executing " + job + '+' + job.getDelay() + "sec");
                         if (config.notifyFreamon()) {
                             Freamon.onStop(job.getJobID(), endTime);
                         }
                     }
                 }
                 // TODO: create experiment summary file/output
-                out.flush();
-                out.close();
+                logPrintStream.flush();
+                logPrintStream.close();
+
+                while ((line = buffErr.readLine()) != null) System.out.println("[STDERR] " + line);
             } catch (Exception e) {
                 e.printStackTrace();
             }
