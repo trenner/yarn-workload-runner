@@ -4,7 +4,7 @@ package parser;
 import Core.Job;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
-import util.Tuple3;
+import util.Argument;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -38,6 +38,7 @@ public class JobParser {
 
             // per Job
             for (Element jobElement : jobs) {
+                // TODO: use JobFactory and Contructor only, no setting here
                 Job job = new Job();
 
                 job.setJobName(jobElement.getAttribute("name"));
@@ -68,7 +69,8 @@ public class JobParser {
                     break;
                 case "arguments":
 //                    job.setRunnerArguments(getArguments(item , "-"));
-                    job.setOrOverwriteRunnerArguments(getArguments(item, "-"));
+                    job.setOrOverwriteRunnerArguments(getArguments(item));
+                    // TODO: don't always set the prefix, just add it in concatArguements
                     break;
             }
 
@@ -86,14 +88,14 @@ public class JobParser {
                     break;
                 case "arguments":
 //                    job.setJarArguments(getArguments(item, ""));
-                    job.setOrOverwriteJarArguments(getArguments(item, ""));
+                    job.setOrOverwriteJarArguments(getArguments(item));
                     break;
             }
         }
     }
 
-    private static ArrayList<Tuple3> getArguments(Node node, String prefix) {
-        ArrayList<Tuple3> argumentList = new ArrayList<>();
+    private static ArrayList<Argument> getArguments(Node node) {
+        ArrayList<Argument> argumentList = new ArrayList<>();
 
         NodeList arguments = node.getChildNodes();
         for (int i = 0; i < arguments.getLength(); i++) {
@@ -104,7 +106,7 @@ public class JobParser {
                 if (attributes.getLength() != 0) {
                     parameterName = argument.getAttributes().item(0).getNodeValue();
                 }
-                argumentList.add(new Tuple3(parameterName, prefix, argument.getTextContent()));
+                argumentList.add(new Argument(parameterName, argument.getTextContent()));
             }
         }
         return argumentList;

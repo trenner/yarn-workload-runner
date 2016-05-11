@@ -3,14 +3,12 @@ package util;
 /**
  * Created by joh-mue on 22/04/16.
  */
-public class Tuple3 {
+public class Argument {
     private String key;
-    private String prefix;
     private String value;
 
-    public Tuple3(String key, String prefix, String value) {
+    public Argument(String key, String value) {
         this.key = key;
-        this.prefix = prefix;
         this.value = value;
     }
 
@@ -28,7 +26,7 @@ public class Tuple3 {
 
     @Override
     public String toString() {
-        return prefix + key + " " + value;
+        return key + " " + value;
 
     }
 }

@@ -1,7 +1,7 @@
 package Core;
 
 import Core.commandBuilder.CommandBuilder;
-import util.Tuple3;
+import util.Argument;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,8 +15,8 @@ import java.util.ArrayList;
 public class Job {
 
     private String jarFile;
-    private ArrayList<Tuple3> runnerArguments;
-    private ArrayList<Tuple3> jarArguments;
+    private ArrayList<Argument> runnerArguments;
+    private ArrayList<Argument> jarArguments;
     private CommandBuilder cmdBuilder;
     private String runner;
     private String jobName;
@@ -27,7 +27,7 @@ public class Job {
 
     /* Constructors */
 
-    public Job(String jarFile, ArrayList<Tuple3> runnerArguments, ArrayList<Tuple3> jarArguments, CommandBuilder cmdBuilder,
+    public Job(String jarFile, ArrayList<Argument> runnerArguments, ArrayList<Argument> jarArguments, CommandBuilder cmdBuilder,
                String runner, String jobName, Integer duplicateNumber, Long delay, String experimentName) {
         this.jarFile = jarFile;
         this.runnerArguments = runnerArguments;
@@ -109,15 +109,15 @@ public class Job {
         return cmdBuilder.getCommand(runnerArguments, jarFile, jarArguments);
     }
 
-    private void setArgument(String value, ArrayList<Tuple3> arguments) {
+    private void setArgument(String value, ArrayList<Argument> arguments) {
         setArgument("", value, arguments);
     }
 
-    private void setArgument(String key, String value, ArrayList<Tuple3> arguments) {
+    private void setArgument(String key, String value, ArrayList<Argument> arguments) {
         if (key.isEmpty()) {
-            arguments.add(new Tuple3(key, "", value));
+            arguments.add(new Argument(key, value));
         } else {
-            for (Tuple3 tuple : arguments) {
+            for (Argument tuple : arguments) {
                 if (tuple.getKey().equalsIgnoreCase(key)) {
                     tuple.setValue(value);
                 }
@@ -125,16 +125,16 @@ public class Job {
         }
     }
 
-    private void setOrOverwriteArguments(ArrayList<Tuple3> arguments, ArrayList<Tuple3> newArguments) {
+    private void setOrOverwriteArguments(ArrayList<Argument> arguments, ArrayList<Argument> newArguments) {
         if (arguments.isEmpty()) {
             arguments.addAll(newArguments);
         } else {
-            ArrayList<Tuple3> argumentsToAdd = new ArrayList<>();
-            for (Tuple3 newTuple: newArguments) {
+            ArrayList<Argument> argumentsToAdd = new ArrayList<>();
+            for (Argument newTuple: newArguments) {
                 if (newTuple.getKey().isEmpty()) {
                     arguments.add(newTuple);
                 } else {
-                    for (Tuple3 tuple: arguments) {
+                    for (Argument tuple: arguments) {
                         if (tuple.getKey().equalsIgnoreCase(newTuple.getKey())) {
                             tuple.setValue(newTuple.getValue());
                         }
@@ -154,15 +154,15 @@ public class Job {
         setArgument(key, value, runnerArguments);
     }
 
-    public void setRunnerArguments(ArrayList<Tuple3> runnerArguments) {
+    public void setRunnerArguments(ArrayList<Argument> runnerArguments) {
         this.runnerArguments = runnerArguments;
     }
 
-    public void setOrOverwriteRunnerArguments(ArrayList<Tuple3> newArguments) {
+    public void setOrOverwriteRunnerArguments(ArrayList<Argument> newArguments) {
         setOrOverwriteArguments(runnerArguments, newArguments);
     }
 
-    public ArrayList<Tuple3> getRunnerArguments() {
+    public ArrayList<Argument> getRunnerArguments() {
         return runnerArguments;
     }
 
@@ -176,15 +176,15 @@ public class Job {
         setArgument(key, value, jarArguments);
     }
 
-    public void setJarArguments(ArrayList<Tuple3> jarArguments) {
+    public void setJarArguments(ArrayList<Argument> jarArguments) {
         this.jarArguments = jarArguments;
     }
 
-    public void setOrOverwriteJarArguments(ArrayList<Tuple3> newArguments) {
+    public void setOrOverwriteJarArguments(ArrayList<Argument> newArguments) {
         setOrOverwriteArguments(jarArguments, newArguments);
     }
 
-    public ArrayList<Tuple3> getJarArguments() {
+    public ArrayList<Argument> getJarArguments() {
         return jarArguments;
     }
 
@@ -218,5 +218,9 @@ public class Job {
 
     public void setJobName(String jobName) {
         this.jobName = jobName;
+    }
+
+    public String getRunnerArgumentPrefix() {
+        return cmdBuilder.getRunnerPrefix();
     }
 }

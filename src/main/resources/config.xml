@@ -27,4 +27,5 @@
         <freamonMasterPort>1235</freamonMasterPort>
         <freamonMasterSystemName>masterSystem</freamonMasterSystemName>
         <freamonMasterActorName>monitorMaster</freamonMasterActorName>
+
 </config>
