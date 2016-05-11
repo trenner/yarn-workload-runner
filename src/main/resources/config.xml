@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <config>
-    <hadoop-home>/path/to/hadoop-2.7.1/etc/hadoop/</hadoop-home>
+    <hadoop-conf-dir>/path/to/hadoop-2.7.1/etc/hadoop/</hadoop-conf-dir>`
     <flink-home-dir>/path/to/flink-0.10.1/</flink-home-dir>
     <log-dir>/path/to/logs/</log-dir>
 

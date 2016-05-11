@@ -1,6 +1,9 @@
 # Created by https://www.gitignore.io/api/maven,osx,linux
 
 logs/
+logs.txt
+src/main/resources/trenner-jobs.xml
+/src/main/resources/my_*
 
 ### Maven ###
 target/
