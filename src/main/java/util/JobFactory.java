@@ -1,6 +1,7 @@
 package util;
 
 import Core.Job;
+import Core.JobDefinition;
 import parser.JobParser;
 
 import java.io.File;
@@ -13,7 +14,7 @@ import java.util.NoSuchElementException;
  * Created by joh-mue on 10/02/16.
  */
 public class JobFactory extends ArrayList<Job> {
-    ArrayList<Job> jobPrototypes;
+    ArrayList<JobDefinition> jobPrototypes;
     HashMap<String, Integer> duplicateNumbers;
 
     public JobFactory(File jobFile) {
@@ -30,13 +31,20 @@ public class JobFactory extends ArrayList<Job> {
                 String key = experimentName + jobName + delay.toString();
                 Integer count = duplicateNumbers.get(key);
                 if (duplicateNumbers.containsKey(key)) {
-//                    count++;
                     duplicateNumbers.put(key, ++count);
                 } else {
                     duplicateNumbers.put(key, 0);
                     count = 0;
                 }
-                return jobPrototype.cloneAndSet(experimentName, jobName, delay, count);
+
+                Job jobClone = jobPrototype.clone();
+                jobClone.setExperimentName(experimentName);
+                jobClone.setJobName(jobName);
+                jobClone.setDelay(delay);
+                jobClone.setDuplicateNumber(count);
+
+                return jobClone;
+//                return jobPrototype.cloneAndSet(experimentName, jobName, delay, count);
             }
         }
         throw new NoSuchElementException(jobName + " is not in the List of jobs.");

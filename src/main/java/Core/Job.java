@@ -40,6 +40,10 @@ public class Job {
         this.experimentName = experimentName;
     }
 
+    /**
+     * should not be used. jobs must be fully initialized
+     */
+    @Deprecated
     public Job() {
         // TODO: optimize default constructor
         duplicateNumber = 0;
@@ -77,16 +81,29 @@ public class Job {
     }
 
     /**
-     * Returns a copy form this prototype with different values for experimentName, jobName and delay
+     * Returns a clone of this job.
      *
-     * @param experimentName
-     * @param jobName
-     * @param delay
+     * NOT READY for use
      * @return
      */
-    public Job cloneAndSet(String experimentName, String jobName, long delay, Integer duplicateNumber) {
-        return new Job(jarFile, runnerArguments, jarArguments, cmdBuilder,
-                runner, jobName, duplicateNumber, delay, experimentName);
+    @Override
+    @Deprecated
+    public Job clone() {
+        ArrayList<Argument> runnerArgumentsClone = new ArrayList<>();
+        runnerArguments.forEach( tuple3 -> runnerArgumentsClone.add(tuple3));
+
+        Job jobClone = new Job(
+                new String(jarFile),
+                runnerArguments,
+                jarArguments,
+                cmdBuilder,
+                new String(runner),
+                new String(jobName),
+                new Integer(duplicateNumber),
+                new Long(delay),
+                new String(experimentName));
+
+        return jobClone;
     }
 
     /* getter and setter */
@@ -226,5 +243,17 @@ public class Job {
 
     public String getRunnerArgumentPrefix() {
         return cmdBuilder.getRunnerPrefix();
+    }
+
+    public void setExperimentName(String experimentName) {
+        this.experimentName = experimentName;
+    }
+
+    public void setDuplicateNumber(Integer duplicateNumber) {
+        this.duplicateNumber = duplicateNumber;
+    }
+
+    public void setDelay(Long delay) {
+        this.delay = delay;
     }
 }

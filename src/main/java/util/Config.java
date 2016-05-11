@@ -85,7 +85,7 @@ public class Config {
         String baseLogDir = Config.getInstance().getConfigItem(LOG_DIR);
         return new File(baseLogDir + '/' + experimentName);
     }
-
+    
     public String getHadoopConfDir() {
             return getConfigItem(HADOOP_CONF_DIR);
     }

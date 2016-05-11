@@ -2,6 +2,7 @@ package parser;
 
 
 import Core.Job;
+import Core.JobDefinition;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 import util.Argument;
@@ -18,7 +19,7 @@ public class JobParser {
     // TODO: Use the logger or get rid of it
     private static final Logger LOG = Logger.getLogger(JobParser.class);
 
-    public static ArrayList<Job> parseJobs(File jobFile) {
+    public static ArrayList<JobDefinition> parseJobs(File jobFile) {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
