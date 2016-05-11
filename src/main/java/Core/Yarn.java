@@ -24,16 +24,6 @@ public class Yarn {
         for (JobSequence jobSequence: schedule) {
             Thread jobThread = new Thread(new JobRunner(jobSequence));
             jobThread.start();
-
-            if (Config.getInstance().sequentialExecution()) {
-                synchronized (jobThread) {
-                    try {
-                        jobThread.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
         }
     }
 
@@ -45,11 +35,9 @@ public class Yarn {
         }
 
         public void run() {
-            synchronized (this) {
                 for (Job job: jobSequence) {
                     executeJob(job);
                 }
-            }
         }
 
         private void executeJob(Job job) {
