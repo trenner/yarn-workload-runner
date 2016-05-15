@@ -54,15 +54,6 @@ public class Config {
     public String getHadoopConfDir() { return getConfigItem("hadoop-donf-dir"); }
 
     /**
-     * Returns true if sequential execution is wanted false otherwise. Start delays will be relative
-     * to the last job that was submitted.
-     * @return boolean indicating if sequential execution is desired
-     */
-    public boolean sequentialExecution() {
-        return getBooleanConfigItem("sequentialExecution");
-    }
-
-    /**
      * Returns true if logs should be overwritten if they already exist for any given job
      * @return boolean indicating if logs should be overwriten
      */
