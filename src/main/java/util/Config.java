@@ -4,13 +4,27 @@ import parser.ConfigParser;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 /**
  * Created by joh-mue on 29/02/16.
  */
 public class Config {
     private static Config instance;
-    private HashMap config;
+    private HashMap<String,String> itemHash;
+
+    public static final String HADOOP_CONF_DIR= "hadoop-conf-dir";
+    public static final String FLINK_HOME= "flink-home-dir";
+    public static final String LOG_DIR = "log-dir";
+    public static final String OVERWRITE_LOGS= "overwriteLogs";
+
+    public static final String NOTIFY_FREAMON= "notifyFreamon";
+    public static final String AKKA_HOST = "akkaHost";
+    public static final String AKKA_PORT = "akkaPort";
+    public static final String FREAMON_MASTER_HOST = "freamonMasterHost";
+    public static final String FREAMON_MASTER_PORT = "freamonMasterPort";
+    public static final String FREAMON_MASTER_SYSTEM = "freamonMasterSystemName";
+    public static final String FREAMON_MASTER_ACTOR = "freamonMasterActorName";
 
     // TODO: not a proper singleton initialization
     public static void initializeConfig(File configFile) {
@@ -33,33 +47,49 @@ public class Config {
     }
 
     private Config(File configFile) {
-        config = ConfigParser.parseConfig(configFile);
+        itemHash = ConfigParser.parseConfig(configFile);
     }
 
-    // TODO: [009a] once all the parameters are know this should be made more precise
+    /**
+     * Returns the value for a certain configuration item. Use the public constants of this class to retrieve the values.
+     *
+     * Throws an NoSuchElementException if key does not match an item in the configuration file
+     *
+     * @param key
+     * @return
+     */
     public String getConfigItem(String key) {
-        return (String) config.get(key);
+        String configItem = itemHash.get(key);
+        if (configItem == null) {
+            throw new NoSuchElementException("The item " + key + " was not set in your configuration file ().");
+        } else {
+            return configItem;
+        }
     }
 
+    /**
+     * Returns the boolean value for a certain configuration item. Use the public constants of this class to
+     * retrieve the values.
+     *
+     * @param key
+     * @return
+     */
     private boolean getBooleanConfigItem(String key) {
-        return getConfigItem(key).equalsIgnoreCase("true");
+            return getConfigItem(key).equalsIgnoreCase("true");
     }
 
     public static File getLogDir(String experimentName) {
         // TODO: [009b]should not call getInstance but be static instead
-        String baseLogDir = Config.getInstance().getConfigItem("log-dir");
+        String baseLogDir = Config.getInstance().getConfigItem(LOG_DIR);
         return new File(baseLogDir + '/' + experimentName);
     }
 
-    public String getHadoopConfDir() { return getConfigItem("hadoop-donf-dir"); }
+    public String getHadoopConfDir() {
+            return getConfigItem(HADOOP_CONF_DIR);
+    }
 
-    /**
-     * Returns true if sequential execution is wanted false otherwise. Start delays will be relative
-     * to the last job that was submitted.
-     * @return boolean indicating if sequential execution is desired
-     */
-    public boolean sequentialExecution() {
-        return getBooleanConfigItem("sequentialExecution");
+    public String getFlinkHome() {
+        return getConfigItem(FLINK_HOME);
     }
 
     /**
@@ -67,7 +97,7 @@ public class Config {
      * @return boolean indicating if logs should be overwriten
      */
     public boolean overwriteLogs() {
-        return getBooleanConfigItem("overwriteLogs");
+        return getBooleanConfigItem(OVERWRITE_LOGS);
     }
 
     /**
@@ -75,6 +105,6 @@ public class Config {
      * @return
      */
     public boolean notifyFreamon() {
-        return getBooleanConfigItem("notifyFreamon");
+        return getBooleanConfigItem(NOTIFY_FREAMON);
     }
 }
