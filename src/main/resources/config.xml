@@ -1,17 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <config>
-    <hadoop-home>/path/to/hadoop-2.7.1/etc/hadoop/</hadoop-home>
-    <flink-home-dir>/path/to/flink-0.10.1/</flink-home-dir>
-    <log-dir>/path/to/logs/</log-dir>
+    <!-- general configuration -->
+        <!-- to set the HADOOP_CONF_DIR environment variable -->
+        <hadoop-conf-directory>/path/to/hadoop-2.7.1/etc/hadoop/</hadoop-conf-directory>
 
-    <overwriteLogs>false</overwriteLogs>
+        <!-- directory where your flink instance resides -->
+        <flink-home-dir>/path/to/flink-0.10.1/</flink-home-dir>
 
-    <notifyFreamon>false</notifyFreamon>
-    <akkaHost>cluster01.example.com</akkaHost>
-    <akkaPort>1234</akkaPort>
-    <freamonMasterHost>cluster01.example.com</freamonMasterHost>
-    <freamonMasterPort>1235</freamonMasterPort>
-    <freamonMasterSystemName>masterSystem</freamonMasterSystemName>
-    <freamonMasterActorName>monitorMaster</freamonMasterActorName>
+        <!-- directory where your spark instance resides -->
+        <spark-home-dir>/path/to/flink-0.10.1/</spark-home-dir>
+
+        <!-- this is where logs will be saved to -->
+        <log-dir>/path/to/logs/</log-dir>
+
+        <!-- do you want to be prompted when logs already exist or should they simply be overwritten? -->
+        <overwriteLogs>false</overwriteLogs>
+
+
+
+    <!-- Freamon related configurations -->
+        <notifyFreamon>false</notifyFreamon>
+        <akkaHost>cluster01.example.com</akkaHost>
+        <akkaPort>1234</akkaPort>
+        <freamonMasterHost>cluster01.example.com</freamonMasterHost>
+        <freamonMasterPort>1235</freamonMasterPort>
+        <freamonMasterSystemName>masterSystem</freamonMasterSystemName>
+        <freamonMasterActorName>monitorMaster</freamonMasterActorName>
 </config>
