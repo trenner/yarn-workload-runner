@@ -24,44 +24,32 @@ public class Yarn {
         for (JobSequence jobSequence: schedule) {
             Thread jobThread = new Thread(new JobRunner(jobSequence));
             jobThread.start();
-
-            if (Config.getInstance().sequentialExecution()) {
-                synchronized (jobThread) {
-                    try {
-                        jobThread.wait();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
         }
     }
 
     private class JobRunner implements Runnable {
         private JobSequence jobSequence;
+        private String[] envp;
+        private Config config;
 
         public JobRunner(JobSequence jobSequence) {
             this.jobSequence = jobSequence;
+            config = Config.getInstance();
+            envp = new String[] { "HADOOP_CONF_DIR=" + config.getHadoopConfDir() };
         }
 
         public void run() {
-            synchronized (this) {
                 for (Job job: jobSequence) {
                     executeJob(job);
                 }
-            }
         }
 
         private void executeJob(Job job) {
             try {
-                Config config = Config.getInstance();
-
                 System.out.println("Waiting " + job.getDelay() + " to execute " + job.getJobName());
                 Thread.sleep(job.getDelay() * 1000, 0);
 
                 PrintStream logPrintStream = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
-
-                String[] envp = { "HADOOP_CONF_DIR=" + config.getHadoopConfDir() };
 
                 System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
                 Process process = Runtime.getRuntime().exec(job.getCommand(),envp);
