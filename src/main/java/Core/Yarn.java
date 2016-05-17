@@ -46,13 +46,13 @@ public class Yarn {
 
         private void executeJob(Job job) {
             try {
-                System.out.println("Waiting " + job.getDelay() + " to execute " + job.getJobName());
+                System.out.println("Waiting " + job.getDelay() + "seconds to execute " + job.getJobName());
                 Thread.sleep(job.getDelay() * 1000, 0);
 
                 PrintStream logPrintStream = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
 
                 System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
-                Process process = Runtime.getRuntime().exec(job.getCommand(),envp);
+                Process process = Runtime.getRuntime().exec(job.getCommand(), envp);
                 InputStream inputStream = process.getInputStream();
                 InputStream errorStream = process.getErrorStream();
                 BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
@@ -62,7 +62,7 @@ public class Yarn {
                 long startTime = 0;
                 while ((line = buff.readLine()) != null) {
                     logPrintStream.println(line);
-                    if (line.contains("Submitted application")) {
+                    if (line.contains(job.getCmdBuilder().getSubmittedLine())) {
                         String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
                         job.setJobID(jobID);
                         System.out.println("Submitted " + job + '+' + job.getDelay() + "sec as " + jobID);
@@ -71,14 +71,14 @@ public class Yarn {
                         }
                     }
 
-                    if (line.contains("All TaskManagers are connected")) {
+                    if (line.contains(job.getCmdBuilder().getStartLine())) {
                         startTime = System.currentTimeMillis();
                         if (config.notifyFreamon()) {
                             Freamon.onStart(job.getJobID(), startTime);
                         }
                     }
 
-                    if (line.contains("The following messages were created by the YARN cluster while running the Job:")) {
+                    if (line.contains(job.getCmdBuilder().getStopLine())) {
                         long endTime = System.currentTimeMillis();
                         long duration = (endTime - startTime);
                         System.out.println("Took " + duration / 1000

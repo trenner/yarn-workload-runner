@@ -3,13 +3,13 @@
 <config>
     <!-- general configuration -->
         <!-- to set the HADOOP_CONF_DIR environment variable -->
-        <hadoop-conf-directory>/path/to/hadoop-2.7.1/etc/hadoop/</hadoop-conf-directory>
+        <hadoop-conf-dir>/path/to/hadoop-2.7.1/etc/hadoop/</hadoop-conf-dir>
 
         <!-- directory where your flink instance resides -->
         <flink-home-dir>/path/to/flink-0.10.1/</flink-home-dir>
 
         <!-- directory where your spark instance resides -->
-        <spark-home-dir>/path/to/flink-0.10.1/</spark-home-dir>
+        <spark-home-dir>/path/to/spark-16.1-bin-hadoop2.6/</spark-home-dir>
 
         <!-- this is where logs will be saved to -->
         <log-dir>/path/to/logs/</log-dir>

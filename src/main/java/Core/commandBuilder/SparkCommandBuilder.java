@@ -1,5 +1,6 @@
 package Core.commandBuilder;
 
+import com.sun.javaws.exceptions.MissingFieldException;
 import util.Config;
 import util.Argument;
 
@@ -11,25 +12,30 @@ import java.util.ArrayList;
 public class SparkCommandBuilder extends CommandBuilder {
     @Override
     public String getCommand(ArrayList<Argument> runnerArguments, String jarFile, ArrayList<Argument> jarArguments) {
-        String sparkHome = Config.getInstance().getConfigItem("spark-home-dir");
+        String sparkHome = Config.getInstance().getSparkHome();
 
-        String command = sparkHome + "/bin/spark-submit" + "--master yarn --deploy-mode cluster" + concatRunnerArguments(runnerArguments) + jarFile + concatJarArguments(jarArguments);
-        return null;
+        if (jarFile.charAt(0) == '.') { // if the jarfile is relative (start with '.') it will be relative to flinkhome
+            jarFile = sparkHome + "/" + jarFile.substring(1);
+        }
+
+        return sparkHome + "/bin/spark-submit "
+                + "--master yarn --deploy-mode cluster" + concatRunnerArguments(runnerArguments)
+                + jarFile + concatJarArguments(jarArguments);
     }
 
     @Override
     public String getStartLine() {
-        return null;
+        return "not yet set";
     }
 
     @Override
     public String getStopLine() {
-        return null;
+        return "not yet set";
     }
 
     @Override
     public String getSubmittedLine() {
-        return null;
+        return "not yet set";
     }
 
     @Override

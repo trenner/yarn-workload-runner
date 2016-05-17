@@ -105,6 +105,10 @@ public class Job {
         }
     }
 
+    public CommandBuilder getCmdBuilder() {
+        return cmdBuilder;
+    }
+
     public String getCommand() {
         return cmdBuilder.getCommand(runnerArguments, jarFile, jarArguments);
     }
