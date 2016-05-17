@@ -1,5 +1,6 @@
 package util;
 
+import com.sun.javaws.exceptions.MissingFieldException;
 import parser.ConfigParser;
 
 import java.io.File;
@@ -13,8 +14,9 @@ public class Config {
     private static Config instance;
     private HashMap<String,String> itemHash;
 
-    public static final String HADOOP_CONF_DIR= "hadoop-conf-dir";
-    public static final String FLINK_HOME= "flink-home-dir";
+    public static final String HADOOP_CONF_DIR = "hadoop-conf-dir";
+    public static final String FLINK_HOME = "flink-home-dir";
+    public static final String SPARK_HOME = "spark-home-dir";
     public static final String LOG_DIR = "log-dir";
     public static final String OVERWRITE_LOGS= "overwriteLogs";
 
@@ -61,10 +63,10 @@ public class Config {
     public String getConfigItem(String key) {
         String configItem = itemHash.get(key);
         if (configItem == null) {
-            throw new NoSuchElementException("The item " + key + " was not set in your configuration file ().");
-        } else {
-            return configItem;
+            System.out.println("The item " + key + " was not set in your configuration file.");
+            System.exit(0);
         }
+        return configItem;
     }
 
     /**
@@ -81,6 +83,10 @@ public class Config {
     public static File getLogDir(String experimentName) {
         // TODO: [009b]should not call getInstance but be static instead
         String baseLogDir = Config.getInstance().getConfigItem(LOG_DIR);
+        if (baseLogDir.isEmpty()) {
+            System.out.println("You did not set " + LOG_DIR + " in your configuration file.");
+            System.exit(0);
+        }
         return new File(baseLogDir + '/' + experimentName);
     }
 
@@ -88,8 +94,32 @@ public class Config {
             return getConfigItem(HADOOP_CONF_DIR);
     }
 
+    /**
+     * If flink-home-dir is not set the program terminates.
+     *
+     * @return
+     */
     public String getFlinkHome() {
-        return getConfigItem(FLINK_HOME);
+        String flinkHome = getConfigItem(FLINK_HOME);
+        if (flinkHome.isEmpty()) {
+            System.out.println("You did not set " + FLINK_HOME + " in your configuration file.");
+            System.exit(0);
+        }
+        return flinkHome;
+    }
+
+    /**
+     * If spark-home-dir is not set the program terminates.
+     *
+     * @return
+     */
+    public String getSparkHome() {
+        String sparkHome = getConfigItem(SPARK_HOME);
+        if (sparkHome.isEmpty()) {
+            System.out.println("You did not set " + SPARK_HOME + " in your configuration file.");
+            System.exit(0);
+        }
+        return sparkHome;
     }
 
     /**

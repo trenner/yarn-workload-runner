@@ -12,7 +12,7 @@ public class FlinkCommandBuilder extends CommandBuilder {
 
     @Override
     public String getCommand(ArrayList<Argument> runnerArguments, String jarFile, ArrayList<Argument> jarArguments) {
-        String flinkHome = Config.getInstance().getConfigItem("flink-home-dir");
+        String flinkHome = Config.getInstance().getFlinkHome();
 
         if (jarFile.charAt(0) == '.') { // if the jarfile is relative (start with '.') it will be relative to flinkhome
             jarFile = flinkHome + "/" + jarFile.substring(1);
