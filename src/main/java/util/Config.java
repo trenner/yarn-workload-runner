@@ -130,10 +130,17 @@ public class Config {
     }
 
     /**
-     * Returns true if freamon functionality should be executed
+     * Returns true if freamon functionality should be executed. If notifyFreamon is not set, the default value 'false'
+     * is returned.
+     *
      * @return
      */
     public boolean notifyFreamon() {
-        return getBooleanConfigItem(NOTIFY_FREAMON);
+        String configItem = itemHash.get(NOTIFY_FREAMON);
+        if (configItem == null) {
+            return false;
+        } else {
+            return configItem.equalsIgnoreCase("true");
+        }
     }
 }
