@@ -44,4 +44,23 @@
             </arguments>
         </jar>
     </job>
+
+    <job name="sparkpi">
+        <runner>
+            <name>spark</name>
+            <arguments>
+                <argument name="class">org.apache.spark.examples.SparkPi</argument>
+                <!--<argument name="driver-memory">1g</argument>-->
+                <!--<argument name="executor-memory">512m</argument>-->
+                <!--<argument name="executor-cores">1</argument>-->
+                <!--<argument name="queue">thequeue</argument>-->
+            </arguments>
+        </runner>
+        <jar>
+            <path>./lib/spark-examples-1.6.1-hadoop2.6.0.jar</path>
+            <arguments>
+                <argument>10</argument>
+            </arguments>
+        </jar>
+    </job>
 </jobs>

@@ -69,7 +69,7 @@ public class ScheduleParser {
 
         Job job;
         String textContent = jobNode.getTextContent();
-        if (jobNode.getTextContent().isEmpty() || jobNode.getTextContent().startsWith("\n")) { // no value defaults to 0
+        if (textContent.isEmpty() || textContent.startsWith("\n")) { // no value defaults to 0
             Long delay = new Long(0);
 
             Node delayNode = ((Element) jobNode).getElementsByTagName("delay").item(0);
