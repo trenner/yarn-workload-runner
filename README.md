@@ -74,9 +74,32 @@ jobs.xml
             </arguments>
         </jar>
     </job>
+
+    <job name="sparkpi">
+        <runner>
+            <name>spark</name>
+            <arguments> <!-- the arguments 'master' and 'deploy-mode' will be added per default-->
+                <argument name="class">org.apache.spark.examples.SparkPi</argument>
+                <!--<argument name="driver-memory">4g</argument>-->
+                <!--<argument name="executor-memory">1g</argument>-->
+                <!--<argument name="executor-cores">1</argument>-->
+                <!--<argument name="queue">thequeue</argument>-->
+            </arguments>
+        </runner>
+        <jar>
+            <path>./lib/spark-examples-1.6.1-hadoop2.6.0.jar</path>
+            <arguments>
+                <argument>10</argument>
+            </arguments>
+        </jar>
+    </job>
     ...
 </jobs>
 ```
+
+Note that for spark jobs the command is build with ```/bin/spark-submit --master yarn --deploy-mode cluster``` so the
+arguments ```--master``` and ``--deploy-mode``` are not necessary for a spark job submission.
+
 
 make a schedule.xml file where your experiment schedule is layed out
 
