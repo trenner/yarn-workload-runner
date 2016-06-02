@@ -28,7 +28,8 @@ public class FlinkCommandBuilder extends CommandBuilder {
 
     @Override
     public String getStopLine() {
-        return "The following messages were created by the YARN cluster while running the Job:";
+//        return "The following messages were created by the YARN cluster while running the Job:";
+        return "Job execution switched to status FINISHED.";
     }
 
     @Override
@@ -39,5 +40,23 @@ public class FlinkCommandBuilder extends CommandBuilder {
     @Override
     public String getRunnerPrefix() {
         return "-";
+    }
+
+    @Override
+    public boolean isStartLine(String logLine) {
+        boolean isSL = logLine.contains("Job execution switched to status RUNNING.")
+                || logLine.contains("The following messages were created by the YARN cluster while running the Job:");
+        return isSL;
+    }
+
+    @Override
+    public boolean isStopLine(String logLine) {
+        return logLine.contains("Job execution switched to status FINISHED.")
+                || logLine.contains("All TaskManagers are connected");
+    }
+
+    @Override
+    public boolean isSubmittedLine(String logLine) {
+        return logLine.contains("Submitted application");
     }
 }

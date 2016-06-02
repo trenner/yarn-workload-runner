@@ -1,17 +1,29 @@
 package Core;
 
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Logger;
 import parser.ScheduleParser;
 import util.Config;
 import util.JobFactory;
 import util.Schedule;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class YarnTimedGenerator {
+
+    final static Logger LOG = Logger.getLogger(YarnTimedGenerator.class);
+
     public static void main(String[] args) {
-        System.out.println("Yarn timed Generator.");
+        BasicConfigurator.configure();
+
+        // TODO: automatically include version number
+        LOG.info("Yarn timed Generator v0.5.1-alpha. \n" +
+                "Commit name 'using log4j, fixed missed stop lines and incomplete timings'. \n");
         // TODO: take default values and overwrite them if necessary
 
         // Load Jobs from jobfile
@@ -33,8 +45,20 @@ public class YarnTimedGenerator {
         // run jobs according to schedule
         Iterator<Schedule> experimentScheduleIterator = experimentSchedules.iterator();
         while (experimentScheduleIterator.hasNext()) {
-            Yarn yarn = new Yarn(experimentScheduleIterator.next());
-            yarn.initiateJobExecution();
+            try {
+                Schedule schedule = experimentScheduleIterator.next();
+                String logFileName = Config.getLogDir(schedule.getExperimentName()) + "/times.log";
+                PrintStream summaryLog = new PrintStream(new FileOutputStream(logFileName), true);
+
+                summaryLog.println("Starting log.");
+                Yarn yarn = new Yarn(schedule, summaryLog);
+                yarn.initiateJobExecution();
+
+                summaryLog.flush();
+                summaryLog.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
             // TODO: wait until the last experiment finished before starting the next one
         }
     }
@@ -47,7 +71,7 @@ public class YarnTimedGenerator {
                 if (Config.getInstance().overwriteLogs()) {
                     delete(expLogDir);
                 } else {
-                    System.out.println("Log directory " + expLogDir +
+                    LOG.error("Log directory " + expLogDir +
                             " already exists. Move or delete those logs first," +
                             " or change the log directory in your config.xml");
                     System.exit(1);
@@ -71,7 +95,7 @@ public class YarnTimedGenerator {
             }
         }
         boolean deleted = dir.delete();
-        System.out.println("Existing logs in " + dir + " deleted: " + deleted);
+        LOG.info("Existing logs in " + dir + " deleted: " + deleted);
         return deleted;
     }
 }

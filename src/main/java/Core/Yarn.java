@@ -1,6 +1,7 @@
 package Core;
 
 import Core.modules.Freamon;
+import org.apache.log4j.Logger;
 import util.Config;
 import util.Schedule;
 
@@ -15,9 +16,13 @@ import java.io.PrintStream;
  */
 public class Yarn {
     private Schedule schedule;
+    private PrintStream summaryLog;
 
-    public Yarn(Schedule schedule) {
+    final static Logger LOG = Logger.getLogger(Yarn.class);
+
+    public Yarn(Schedule schedule, PrintStream summaryLog) {
         this.schedule = schedule;
+        this.summaryLog = summaryLog;
     }
 
     public void initiateJobExecution() {
@@ -46,52 +51,61 @@ public class Yarn {
 
         private void executeJob(Job job) {
             try {
-                System.out.println("Waiting " + job.getDelay() + "seconds to execute " + job.getJobName());
+                LOG.info("Waiting " + job.getDelay() + "seconds to execute " + job.getJobName());
+                summaryLog.println("Waiting " + job.getDelay() + "seconds to execute " + job.getJobName());
                 Thread.sleep(job.getDelay() * 1000, 0);
 
                 PrintStream logPrintStream = job.getLogPrintStream(Config.getLogDir(job.getExperimentName()));
 
-                System.out.println("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
+                LOG.info("Executing " + job + '+' + job.getDelay() + "sec with command: " + job.getCommand());
+
                 Process process = Runtime.getRuntime().exec(job.getCommand(), envp);
-                InputStream inputStream = process.getInputStream();
-                InputStream errorStream = process.getErrorStream();
-                BufferedReader buff = new BufferedReader(new InputStreamReader(inputStream));
-                BufferedReader buffErr = new BufferedReader(new InputStreamReader(errorStream));
+
+                BufferedReader buff = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                BufferedReader buffErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
 
                 String line;
                 long startTime = 0;
+                boolean jobStarted = false;
                 while ((line = buff.readLine()) != null) {
                     logPrintStream.println(line);
-                    if (line.contains(job.getCmdBuilder().getSubmittedLine())) {
+                    summaryLog.println("Analyzing job output.");
+                    if (!jobStarted && job.getCmdBuilder().isSubmittedLine(line)) {
                         String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
                         job.setJobID(jobID);
-                        System.out.println("Submitted " + job + '+' + job.getDelay() + "sec as " + jobID);
+                        LOG.info("Submitted " + job + '+' + job.getDelay() + "sec as " + jobID);
                         if (config.notifyFreamon()) {
                             Freamon.onSubmit(job.getJobID());
                         }
                     }
 
-                    if (line.contains(job.getCmdBuilder().getStartLine())) {
+                    // once the job is marked as started don't check for the started line anymore
+                    if (!jobStarted && job.getCmdBuilder().isStartLine(line)) {
                         startTime = System.currentTimeMillis();
                         if (config.notifyFreamon()) {
                             Freamon.onStart(job.getJobID(), startTime);
                         }
+                        jobStarted = true;
                     }
 
-                    if (line.contains(job.getCmdBuilder().getStopLine())) {
+                    if (jobStarted && job.getCmdBuilder().isStopLine(line)) {
                         long endTime = System.currentTimeMillis();
                         long duration = (endTime - startTime);
-                        System.out.println("Took " + duration / 1000
+                        LOG.info("Took " + duration / 1000
                             + " seconds to complete executing " + job + '+' + job.getDelay() + "sec");
+                        summaryLog.println("["+ Thread.currentThread().getName() + "]" +job.getJobName() + " - " + duration);
                         if (config.notifyFreamon()) {
                             Freamon.onStop(job.getJobID(), endTime);
                         }
+                        jobStarted = false;
                     }
                 }
+
                 // TODO: create experiment summary file/output
                 logPrintStream.flush();
                 logPrintStream.close();
 
+                summaryLog.flush();
                 while ((line = buffErr.readLine()) != null) System.out.println("[STDERR] " + line);
             } catch (Exception e) {
                 e.printStackTrace();

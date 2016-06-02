@@ -79,6 +79,12 @@ public class Config {
             return getConfigItem(key).equalsIgnoreCase("true");
     }
 
+    /**
+     * Get the logging directory for an experiment by it's experiment name as configured in the config.xml
+     *
+     * @param experimentName
+     * @return
+     */
     public static File getLogDir(String experimentName) {
         // TODO: [009b]should not call getInstance but be static instead
         String baseLogDir = Config.getInstance().getConfigItem(LOG_DIR);

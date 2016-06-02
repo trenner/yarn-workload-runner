@@ -41,4 +41,19 @@ public class SparkCommandBuilder extends CommandBuilder {
     public String getRunnerPrefix() {
         return "--";
     }
+
+    @Override
+    public boolean isStartLine(String logLine) {
+        return false;
+    }
+
+    @Override
+    public boolean isStopLine(String logLine) {
+        return false;
+    }
+
+    @Override
+    public boolean isSubmittedLine(String logLine) {
+        return false;
+    }
 }
