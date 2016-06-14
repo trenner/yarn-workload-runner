@@ -44,35 +44,15 @@ public class Freamon extends UntypedActor {
         freamonMaster.forward(message, getContext());
     }
 
-    public static class OnStart implements Serializable {
-        public final String jobID;
-        public final long startTime;
-
-        public OnStart(String jobID, long startTime) {
-            this.jobID = jobID;
-            this.startTime = startTime;
-        }
-    }
-
-    public static class OnStop implements Serializable {
-        public final String jobID;
-        public final long stopTime;
-
-        public OnStop(String jobID, long stopTime) {
-            this.jobID = jobID;
-            this.stopTime = stopTime;
-        }
-    }
-
     public static void onSubmit(String jobID) {
         // we could use this to add not-yet-started jobs to the db
     }
 
     public static void onStart(String jobID, long startTime) {
-        instance.tell(new OnStart(jobID, startTime), instance);
+        instance.tell(new Serializable[]{"jobStarted", jobID, startTime}, instance);
     }
 
     public static void onStop(String jobID, long stopTime) {
-        instance.tell(new OnStop(jobID, stopTime), instance);
+        instance.tell(new Serializable[]{"jobStopped", jobID, stopTime}, instance);
     }
 }
