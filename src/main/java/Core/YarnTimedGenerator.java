@@ -23,7 +23,7 @@ public class YarnTimedGenerator {
 
         // TODO: automatically include version number
         LOG.info("Yarn timed Generator v0.5.1-alpha. \n" +
-                "Commit name 'using log4j, fixed missed stop lines and incomplete timings'. \n");
+                "Commit name 'updated README for arg-overwrite and job-sequences'. \n");
         // TODO: take default values and overwrite them if necessary
 
         // Load Jobs from jobfile

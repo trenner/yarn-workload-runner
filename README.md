@@ -122,3 +122,58 @@ the locations of the above files must be stated as arguments in the correct orde
 mvn clean install
 java -jar target/YarnWorkloadRunner-1.0-SNAPSHOT-jar-with-dependencies.jar src/main/resources/jobs.xml src/main/resources/schedule.xml src/main/resources/config.xml
 ```
+
+
+---
+
+## Schedule and JobSequences
+
+On top of a plain scheduled job, you can also define job sequences in your schedule.xml. Those job sequences will be
+executed one after the other instead of in parallel. Thus in a sequence of 'jobA', 'JobB', 'JobC', JobC will not start
+until 'JobB' is done executing and 'JobB' won't start until 'JobA' is done executing. Jobs and job sequences may be mixed
+in a schedule.xml
+
+```
+schedule.xml
+
+<suite>
+    <experiment name="exp1">
+        <job name="jobA">1000</job>
+        <job-sequence>
+            <job name="jobA">2000</job>
+            <job name="jobB">3000</job>
+            <job name="jobc">3000</job>
+        <job-sequence>
+    </experiment>
+    ...
+</suite>
+```
+
+---
+
+## Argument overwriting
+
+In order to avoid cluttering the jobs.xml with almost identical copies of job definition that differ only in a certain
+number of values, it is possible to overwrite values of any defined job in your schedule.xml.
+Use the same xml hierarchy to overwrite values. Arguments that are not defined yet or have no name will be added to the
+job definition of the schedule job.
+
+Note: If you overwrite values, the delay cannot simply be added as text context but instead must be contained in it's own
+<delay> xml tag.
+
+```
+<suite>
+    <experiment name="exp1">
+        <job name="jobA">
+            <delay>1000</delay>
+            <runner>
+                <arguments>
+                    <argument name="key">value</argument>
+                    <argument>value</argument>
+                </arguments>
+            </runner>
+        </job>
+    </experiment>
+    ...
+</suite>
+```
