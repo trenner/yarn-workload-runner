@@ -1,5 +1,7 @@
 package Core.commandBuilder;
 
+import akka.io.Dns;
+import org.apache.log4j.Logger;
 import util.Argument;
 import java.util.ArrayList;
 
@@ -7,14 +9,18 @@ import java.util.ArrayList;
  * Created by joh-mue on 23/02/16.
  */
 public abstract class CommandBuilder {
-    public static CommandBuilder getCommandBuilder(String runner) throws Exception {
+    final static Logger LOG = Logger.getLogger(CommandBuilder.class);
+
+    public static CommandBuilder getCommandBuilder(String runner) {
         switch (runner) {
             case "flink": return new FlinkCommandBuilder();
             case "spark": return new SparkCommandBuilder();
         default:
-            throw new Exception("There is no CommandBuilder defined for the runner " + runner + ". Check the runner spelling " +
+            LOG.error("There is no CommandBuilder defined for the runner " + runner + ". Check the runner spelling " +
                     "in your job definition.");
+            System.exit(0);
         }
+        return null;
     }
 
     /**

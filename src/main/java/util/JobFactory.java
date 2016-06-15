@@ -1,6 +1,7 @@
 package util;
 
 import Core.Job;
+import Core.JobDefinition;
 import parser.JobParser;
 
 import java.io.File;
@@ -13,30 +14,29 @@ import java.util.NoSuchElementException;
  * Created by joh-mue on 10/02/16.
  */
 public class JobFactory extends ArrayList<Job> {
-    ArrayList<Job> jobPrototypes;
+    ArrayList<JobDefinition> jobDefinitions;
     HashMap<String, Integer> duplicateNumbers;
 
     public JobFactory(File jobFile) {
-        jobPrototypes = JobParser.parseJobs(jobFile);
+        jobDefinitions = JobParser.parseJobs(jobFile);
         duplicateNumbers = new HashMap<>();
     }
 
     public Job getJob(String experimentName, String jobName, Long delay) {
-        Iterator<Job>  jobPrototypeIterator = jobPrototypes.iterator();
-        while (jobPrototypeIterator.hasNext()) {
-            Job jobPrototype = jobPrototypeIterator.next();
+        Iterator<JobDefinition>  jobDefinitionIterator = jobDefinitions.iterator();
+        while (jobDefinitionIterator.hasNext()) {
+            JobDefinition jobDefinition = jobDefinitionIterator.next();
 
-            if (jobName.equalsIgnoreCase(jobPrototype.getJobName())) {
-                String key = experimentName + jobName + delay.toString();
-                Integer count = duplicateNumbers.get(key);
-                if (duplicateNumbers.containsKey(key)) {
-//                    count++;
-                    duplicateNumbers.put(key, ++count);
+            if (jobName.equalsIgnoreCase(jobDefinition.getJobName())) {
+                String jobID = experimentName + jobName + delay.toString();
+                Integer count = duplicateNumbers.get(jobID);
+                if (duplicateNumbers.containsKey(jobID)) {
+                    duplicateNumbers.put(jobID, ++count);
                 } else {
-                    duplicateNumbers.put(key, 0);
+                    duplicateNumbers.put(jobID, 0);
                     count = 0;
                 }
-                return jobPrototype.cloneAndSet(experimentName, jobName, delay, count);
+                return jobDefinition.createJob(experimentName, delay, count);
             }
         }
         throw new NoSuchElementException(jobName + " is not in the List of jobs.");

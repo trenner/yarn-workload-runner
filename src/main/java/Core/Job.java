@@ -23,7 +23,7 @@ public class Job {
     private String experimentName;
     private Integer duplicateNumber; // to make the logName unique
     private Long delay;
-    private String JobID;
+    private String jobID;
 
     /* Constructors */
 
@@ -38,13 +38,6 @@ public class Job {
         this.duplicateNumber = duplicateNumber;
         this.delay = delay;
         this.experimentName = experimentName;
-    }
-
-    public Job() {
-        // TODO: optimize default constructor
-        duplicateNumber = 0;
-        this.runnerArguments = new ArrayList<>();
-        this.jarArguments = new ArrayList<>();
     }
 
     /* functionality */
@@ -97,12 +90,7 @@ public class Job {
      */
     public void setRunner(String runner) {
         this.runner = runner;
-        try {
-            cmdBuilder = CommandBuilder.getCommandBuilder(runner);
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            e.printStackTrace();
-        }
+        cmdBuilder = CommandBuilder.getCommandBuilder(runner);
     }
 
     public CommandBuilder getCmdBuilder() {
@@ -133,14 +121,15 @@ public class Job {
         if (arguments.isEmpty()) {
             arguments.addAll(newArguments);
         } else {
+            // TODO: [!] why is this variable never used??
             ArrayList<Argument> argumentsToAdd = new ArrayList<>();
-            for (Argument newTuple: newArguments) {
-                if (newTuple.getKey().isEmpty()) {
-                    arguments.add(newTuple);
+            for (Argument newArgument: newArguments) {
+                if (newArgument.getKey().isEmpty()) {
+                    arguments.add(newArgument);
                 } else {
                     for (Argument tuple: arguments) {
-                        if (tuple.getKey().equalsIgnoreCase(newTuple.getKey())) {
-                            tuple.setValue(newTuple.getValue());
+                        if (tuple.getKey().equalsIgnoreCase(newArgument.getKey())) {
+                            tuple.setValue(newArgument.getValue());
                         }
                     }
                 }
@@ -201,11 +190,11 @@ public class Job {
     }
 
     public String getJobID() {
-        return JobID;
+        return jobID;
     }
 
     public void setJobID(String jobID) {
-        JobID = jobID;
+        this.jobID = jobID;
     }
 
     public String getJobName() {

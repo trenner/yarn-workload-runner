@@ -2,6 +2,7 @@ package parser;
 
 
 import Core.Job;
+import Core.JobDefinition;
 import org.apache.log4j.Logger;
 import org.w3c.dom.*;
 import util.Argument;
@@ -18,7 +19,7 @@ public class JobParser {
     // TODO: Use the logger or get rid of it
     private static final Logger LOG = Logger.getLogger(JobParser.class);
 
-    public static ArrayList<Job> parseJobs(File jobFile) {
+    public static ArrayList<JobDefinition> parseJobs(File jobFile) {
         try {
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder documentBuilder = dbFactory.newDocumentBuilder();
@@ -34,23 +35,21 @@ public class JobParser {
                 }
             }
 
-            ArrayList<Job> jobList = new ArrayList();
+            ArrayList<JobDefinition> jobList = new ArrayList();
 
             // per Job
             for (Element jobElement : jobs) {
-                // TODO: use JobFactory and Contructor only, no setting here
-                Job job = new Job();
+                String jobName = jobElement.getAttribute("name");
 
-                job.setJobName(jobElement.getAttribute("name"));
-
-                // Get Runner and parameters
                 Node runnerNode = jobElement.getElementsByTagName("runner").item(0);
-                parseRunnerInfo(runnerNode, job);
+                String runner = parseChildnodeTextContent(runnerNode, "name");
+                ArrayList<Argument> runnerArguments = parseArguments(runnerNode);
 
                 Node jarNode = jobElement.getElementsByTagName("jar").item(0);
-                parseJarInfo(jarNode, job);
+                String jarFile = parseChildnodeTextContent(jarNode, "path");
+                ArrayList<Argument> jarArguments = parseArguments(jarNode);
 
-                jobList.add(job);
+                jobList.add(new JobDefinition(jarFile, runnerArguments, jarArguments, runner, jobName));
             }
             return jobList;
         } catch (Exception e) {
@@ -59,6 +58,29 @@ public class JobParser {
         }
     }
 
+    private static String parseChildnodeTextContent(Node node, String childNodeName) {
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node item = childNodes.item(i);
+            if (item.getNodeName().equalsIgnoreCase(childNodeName)) {
+                return item.getTextContent();
+            }
+        }
+        return null;
+    }
+
+    private static ArrayList<Argument> parseArguments(Node node) {
+        NodeList childNodes = node.getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+            Node item = childNodes.item(i);
+            if (item.getNodeName().equalsIgnoreCase("arguments")) {
+                return getArguments(item);
+            }
+        }
+        return null;
+    }
+
+    // TODO: this can rewritten now, it is only used for jobOverwriting
     public static void parseRunnerInfo(Node runnerNode, Job job) {
         NodeList runnerChildNodes = runnerNode.getChildNodes();
         for (int i = 0; i < runnerChildNodes.getLength(); i++) {
