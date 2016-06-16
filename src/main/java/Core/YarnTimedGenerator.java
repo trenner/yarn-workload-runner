@@ -7,10 +7,7 @@ import util.Config;
 import util.JobFactory;
 import util.Schedule;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -51,12 +48,27 @@ public class YarnTimedGenerator {
                 PrintStream summaryLog = new PrintStream(new FileOutputStream(logFileName), true);
 
                 summaryLog.println("Starting log.");
-                Yarn yarn = new Yarn(schedule, summaryLog);
-                yarn.initiateJobExecution();
 
+                //run with dstat
+                if (Config.getInstance().runDstat()) {
+                    //start  dstat
+                    String dstatFilePath = Config.getLogDir(schedule.getExperimentName()) + "/dstats/";
+                    Process[] dstatArr = startDstat(dstatFilePath);
+
+                    Yarn yarn = new Yarn(schedule, summaryLog);
+                    yarn.initiateJobExecution();
+
+                    //stop dstat
+                    stopDstat(dstatArr);
+                } else {
+                    Yarn yarn = new Yarn(schedule, summaryLog);
+                    yarn.initiateJobExecution();
+                }
                 summaryLog.flush();
                 summaryLog.close();
             } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
                 e.printStackTrace();
             }
             // TODO: wait until the last experiment finished before starting the next one
@@ -82,15 +94,46 @@ public class YarnTimedGenerator {
     }
 
     /**
+     * Starts dstat on all slave nodes and returns all processes collecting dstat data
+     */
+    private static Process[] startDstat(String logFolder) throws IOException {
+        String dstatFilePath = logFolder;
+        //create log dirs
+        Runtime.getRuntime().exec("mkdir -p " + dstatFilePath, new String[0]);
+
+        final String[] slaves = Config.getInstance().getSlaves();
+        final String dstatCmd = Config.getInstance().getDstatCmd();
+        Process[] dstatProcessArr = new Process[slaves.length];
+
+        for (int i = 0; i < slaves.length; i++) {
+            String slave = slaves[i];
+            LOG.info("start dstat with: ssh " + slave + " " + dstatCmd + dstatFilePath + "/dstat-" + slave + ".csv");
+            dstatProcessArr[i] = Runtime.getRuntime().exec("ssh " + slave + " " + dstatCmd + dstatFilePath + "/dstat-" + slave + ".csv");
+        }
+        return dstatProcessArr;
+    }
+
+    /**
+     * Stops all dstat processes
+     */
+    private static void stopDstat(Process[] dstatProcessArr) {
+        for (Process process : dstatProcessArr) {
+            LOG.info("destroy dstat thread");
+            process.destroy();
+        }
+    }
+
+    /**
      * Delete all files (not directories) in this directory and the directory itself if it is empty. If the directory
      * contains any folders the directory and the contained folders will remain. All filles in the dir will be deleted though.
+     *
      * @param dir
      * @return
      */
     private static boolean delete(File dir) {
         File[] files = dir.listFiles();
         if (files != null) {
-            for (File file: files) {
+            for (File file : files) {
                 file.delete();
             }
         }

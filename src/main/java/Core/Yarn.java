@@ -6,21 +6,12 @@ import util.Config;
 import util.Schedule;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-/**
- * Created by joh-mue on 01/02/16.
- */
 public class Yarn {
     private Schedule schedule;
     private PrintStream summaryLog;
-    //   private String dstatCmd = "dstat --epoch --cpu -C total --mem --net -N total --disk -D total --noheaders --nocolor --output ";
-    //   private String[] slaves = {"wally071", "wally072", "wally073", "wally074", "wally075", "wally076", "wally077", "wally078", "wally079", "wally080", "wally081", "wally082", "wally083", "wally084", "wally085", "wally086", "wally087", "wally088", "wally059", "wally090", "wally091", "wally092", "wally093", "wally094", "wally095", "wally096", "wally097", "wally098", "wally099", "wally100", "wally101", "wally060", "wally103", "wally104", "wally105", "wally106", "wally107", "wally108", "wally109", "wally110"};
-    private String[] slaves = Config.getInstance().getSlaves();
-    final private String dstatCmd = Config.getInstance().getDstatCmd();
-
     final static Logger LOG = Logger.getLogger(Yarn.class);
 
     public Yarn(Schedule schedule, PrintStream summaryLog) {
@@ -29,33 +20,22 @@ public class Yarn {
     }
 
     public void initiateJobExecution() {
-        if (Config.getInstance().runDstat()) {
-            try {
-                // start with dstat
-                Process[] dstatProcessArr = new Process[slaves.length];
-                Runtime.getRuntime().exec("mkdir -p" + Config.getInstance().getDstatCmd() + Config.getInstance().getConfigItem("log-dir") + "/" + schedule.getExperimentName() + "/dstats/", new String[0]);
-                for (int i = 0; i < slaves.length; i++) {
-                    String slave = slaves[i];
-                    LOG.info("start dstat with: ssh " + slave + " " + dstatCmd + Config.getInstance().getConfigItem("log-dir") + "/" + schedule.getExperimentName() + "/dstats/dstat-" + slave + ".csv");
-                    dstatProcessArr[i] = Runtime.getRuntime().exec("ssh " + slave + " " + dstatCmd + Config.getInstance().getConfigItem("log-dir") + "/" + schedule.getExperimentName() + "/dstats/dstat-" + slave + ".csv");
-                }
 
-                for (JobSequence jobSequence : schedule) {
-                    Thread jobThread = new Thread(new JobRunner(jobSequence));
-                    jobThread.start();
-                }
-                for (Process process1 : dstatProcessArr) {
-                    process1.destroy();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+        Thread[] jobThreads = new Thread[schedule.size()];
+        for (int i = 0; i < schedule.size(); i++) {
+            JobSequence jobSequence = schedule.get(i);
+            Thread jobThread = new Thread(new JobRunner(jobSequence));
+            jobThreads[i] = jobThread;
+            jobThreads[i].start();
+        }
+
+        // wait for all threads' run() methods to complete before continuing
+        try {
+            for (Thread thread : jobThreads) {
+                thread.join();
             }
-        } else {
-            //start without dstat
-            for (JobSequence jobSequence : schedule) {
-                Thread jobThread = new Thread(new JobRunner(jobSequence));
-                jobThread.start();
-            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -74,8 +54,6 @@ public class Yarn {
             for (Job job : jobSequence) {
                 executeJob(job);
             }
-
-
         }
 
         private void executeJob(Job job) {
