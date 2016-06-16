@@ -46,7 +46,6 @@ public class Job {
      * Returns appropriate, unique PrintStream in the log directory for this job.
      *
      * @param logDir the directory where the log should be created, usually per Config.getLogDir(Schedule experiment)
-     *
      * @return PrintStream for this job or null in case of FileNotFoundException
      */
     public PrintStream getLogPrintStream(File logDir) {
@@ -86,6 +85,7 @@ public class Job {
 
     /**
      * Sets the runner and picks the appropriate CommandBuilder.
+     *
      * @param runner
      */
     public void setRunner(String runner) {
@@ -123,15 +123,41 @@ public class Job {
         } else {
             // TODO: [!] why is this variable never used??
             ArrayList<Argument> argumentsToAdd = new ArrayList<>();
-            for (Argument newArgument: newArguments) {
+            for (Argument newArgument : newArguments) {
                 if (newArgument.getKey().isEmpty()) {
                     arguments.add(newArgument);
                 } else {
-                    for (Argument tuple: arguments) {
-                        if (tuple.getKey().equalsIgnoreCase(newArgument.getKey())) {
-                            tuple.setValue(newArgument.getValue());
+                    for (Argument argument : arguments) {
+                        if (argument.getKey().equalsIgnoreCase(newArgument.getKey())) {
+                            argument.setValue(newArgument.getValue());
                         }
                     }
+                }
+            }
+        }
+    }
+
+    //TODO: This method is copied from the setOrOverwriteArguments method. We cannot parse jar argument names to the cmd builder
+    private void setOrOverwriteJarArguments(ArrayList<Argument> arguments, ArrayList<Argument> newArguments) {
+        if (arguments.isEmpty()) {
+            arguments.addAll(newArguments);
+        } else {
+            // TODO: [!] why is this variable never used??
+            ArrayList<Argument> argumentsToAdd = new ArrayList<>();
+            for (Argument newArgument : newArguments) {
+                if (newArgument.getKey().isEmpty()) {
+                    arguments.add(newArgument);
+                } else {
+                    ArrayList<Argument> argsToAdd = new ArrayList<Argument>();
+                    ArrayList<Argument> argsToRemove = new ArrayList<Argument>();
+                    for (Argument argument : arguments) {
+                        if (argument.getKey().equalsIgnoreCase(newArgument.getKey())) {
+                            argsToAdd.add(new Argument("", newArgument.getValue()));
+                            argsToRemove.add(argument);
+                        }
+                    }
+                    arguments.removeAll(argsToRemove);
+                    arguments.addAll(argsToAdd);
                 }
             }
         }
@@ -140,7 +166,8 @@ public class Job {
     /**
      * Sets or overwrites the argument with given key. Arguments without key cannot be overwritten, instead they will
      * be added to the list of arguments.
-     * @param key - argument to be overwritten.
+     *
+     * @param key   - argument to be overwritten.
      * @param value
      */
     public void setRunnerArgument(String key, String value) {
@@ -162,7 +189,8 @@ public class Job {
     /**
      * Sets or overwrites all arguments with given key. Arguments without key cannot be overwritten, instead they will
      * simply be added to the list of arguments.
-     * @param key - argument to be overwritten.
+     *
+     * @param key   - argument to be overwritten.
      * @param value
      */
     public void setJarArgument(String key, String value) {
@@ -174,7 +202,7 @@ public class Job {
     }
 
     public void setOrOverwriteJarArguments(ArrayList<Argument> newArguments) {
-        setOrOverwriteArguments(jarArguments, newArguments);
+        setOrOverwriteJarArguments(jarArguments, newArguments);
     }
 
     public ArrayList<Argument> getJarArguments() {
