@@ -11,15 +11,15 @@ import java.util.HashMap;
  */
 public class Config {
     private static Config instance;
-    private HashMap<String,String> itemHash;
+    private HashMap<String, String> itemHash;
 
     public static final String HADOOP_CONF_DIR = "hadoop-conf-dir";
     public static final String FLINK_HOME = "flink-home-dir";
     public static final String SPARK_HOME = "spark-home-dir";
     public static final String LOG_DIR = "log-dir";
-    public static final String OVERWRITE_LOGS= "overwriteLogs";
+    public static final String OVERWRITE_LOGS = "overwriteLogs";
 
-    public static final String NOTIFY_FREAMON= "notifyFreamon";
+    public static final String NOTIFY_FREAMON = "notifyFreamon";
     public static final String AKKA_HOST = "akkaHost";
     public static final String AKKA_PORT = "akkaPort";
     public static final String FREAMON_MASTER_HOST = "freamonMasterHost";
@@ -27,9 +27,13 @@ public class Config {
     public static final String FREAMON_MASTER_SYSTEM = "freamonMasterSystemName";
     public static final String FREAMON_MASTER_ACTOR = "freamonMasterActorName";
 
+    public static final String DSTAT = "run-dstat";
+    public static final String DSTAT_CMD = "dstat-cmd";
+    public static final String SLAVES = "slaves";
+
     // TODO: not a proper singleton initialization
     public static void initializeConfig(File configFile) {
-        if(instance == null){
+        if (instance == null) {
             instance = new Config(configFile);
         }
     }
@@ -53,7 +57,7 @@ public class Config {
 
     /**
      * Returns the value for a certain configuration item. Use the public constants of this class to retrieve the values.
-     *
+     * <p/>
      * Throws an NoSuchElementException if key does not match an item in the configuration file
      *
      * @param key
@@ -76,7 +80,7 @@ public class Config {
      * @return
      */
     private boolean getBooleanConfigItem(String key) {
-            return getConfigItem(key).equalsIgnoreCase("true");
+        return getConfigItem(key).equalsIgnoreCase("true");
     }
 
     /**
@@ -96,7 +100,7 @@ public class Config {
     }
 
     public String getHadoopConfDir() {
-            return getConfigItem(HADOOP_CONF_DIR);
+        return getConfigItem(HADOOP_CONF_DIR);
     }
 
     /**
@@ -129,6 +133,7 @@ public class Config {
 
     /**
      * Returns true if logs should be overwritten if they already exist for any given job
+     *
      * @return boolean indicating if logs should be overwriten
      */
     public boolean overwriteLogs() {
@@ -147,6 +152,44 @@ public class Config {
             return false;
         } else {
             return configItem.equalsIgnoreCase("true");
+        }
+    }
+
+    /**
+     * Returns true if dstat should be executed. If dstat is not set, the default value 'false'
+     * is returned.
+     *
+     * @return
+     */
+    public boolean runDstat() {
+        String configItem = itemHash.get(DSTAT);
+        if (configItem == null) {
+            return false;
+        } else {
+            return configItem.equalsIgnoreCase("true");
+        }
+    }
+
+    public String getDstatCmd() {
+        String dstatCmd = getConfigItem(DSTAT_CMD);
+        if (dstatCmd.isEmpty() || !runDstat()) {
+            System.out.println("You did not set " + DSTAT_CMD + "or " + DSTAT + " in your configuration file.");
+            System.exit(0);
+        }
+        return dstatCmd;
+    }
+
+    /**
+     * Returns an array with all slaves nodes.
+     *
+     * @return Array with all slave hostnames
+     */
+    public String[] getSlaves() {
+        String configItem = itemHash.get(SLAVES);
+        if (configItem == null) {
+            return null;
+        } else {
+            return configItem.split(" ");
         }
     }
 }

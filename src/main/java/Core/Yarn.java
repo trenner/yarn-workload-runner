@@ -6,18 +6,12 @@ import util.Config;
 import util.Schedule;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 
-/**
- * Created by joh-mue on 01/02/16.
- *
- */
 public class Yarn {
     private Schedule schedule;
     private PrintStream summaryLog;
-
     final static Logger LOG = Logger.getLogger(Yarn.class);
 
     public Yarn(Schedule schedule, PrintStream summaryLog) {
@@ -26,9 +20,22 @@ public class Yarn {
     }
 
     public void initiateJobExecution() {
-        for (JobSequence jobSequence: schedule) {
+
+        Thread[] jobThreads = new Thread[schedule.size()];
+        for (int i = 0; i < schedule.size(); i++) {
+            JobSequence jobSequence = schedule.get(i);
             Thread jobThread = new Thread(new JobRunner(jobSequence));
-            jobThread.start();
+            jobThreads[i] = jobThread;
+            jobThreads[i].start();
+        }
+
+        // wait for all threads' run() methods to complete before continuing
+        try {
+            for (Thread thread : jobThreads) {
+                thread.join();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 
@@ -40,17 +47,18 @@ public class Yarn {
         public JobRunner(JobSequence jobSequence) {
             this.jobSequence = jobSequence;
             config = Config.getInstance();
-            envp = new String[] { "HADOOP_CONF_DIR=" + config.getHadoopConfDir() };
+            envp = new String[]{"HADOOP_CONF_DIR=" + config.getHadoopConfDir()};
         }
 
         public void run() {
-                for (Job job: jobSequence) {
-                    executeJob(job);
-                }
+            for (Job job : jobSequence) {
+                executeJob(job);
+            }
         }
 
         private void executeJob(Job job) {
             try {
+
                 LOG.info("Waiting " + job.getDelay() + "seconds to execute " + job.getJobName());
                 summaryLog.println("Waiting " + job.getDelay() + "seconds to execute " + job.getJobName());
                 Thread.sleep(job.getDelay() * 1000, 0);
@@ -92,14 +100,15 @@ public class Yarn {
                         long endTime = System.currentTimeMillis();
                         long duration = (endTime - startTime);
                         LOG.info("Took " + duration / 1000
-                            + " seconds to complete executing " + job + '+' + job.getDelay() + "sec");
-                        summaryLog.println("["+ Thread.currentThread().getName() + "]" +job.getJobName() + " - " + duration);
+                                + " seconds to complete executing " + job + '+' + job.getDelay() + "sec");
+                        summaryLog.println("[" + Thread.currentThread().getName() + "]" + job.getJobName() + " - " + duration);
                         if (config.notifyFreamon()) {
                             Freamon.onStop(job.getJobID(), endTime);
                         }
                         jobStarted = false;
                     }
                 }
+
 
                 // TODO: create experiment summary file/output
                 logPrintStream.flush();
