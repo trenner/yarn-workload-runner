@@ -107,7 +107,6 @@ public class YarnTimedGenerator {
 
         for (int i = 0; i < slaves.length; i++) {
             String slave = slaves[i];
-            LOG.info("start dstat with: ssh " + slave + " " + dstatCmd + dstatFilePath + "/dstat-" + slave + ".csv");
             dstatProcessArr[i] = Runtime.getRuntime().exec("ssh " + slave + " " + dstatCmd + dstatFilePath + "/dstat-" + slave + ".csv");
         }
         return dstatProcessArr;
@@ -118,7 +117,6 @@ public class YarnTimedGenerator {
      */
     private static void stopDstat(Process[] dstatProcessArr) {
         for (Process process : dstatProcessArr) {
-            LOG.info("destroy dstat thread");
             process.destroy();
         }
     }
