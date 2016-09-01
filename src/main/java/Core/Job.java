@@ -68,19 +68,6 @@ public class Job {
                 '}';
     }
 
-    /**
-     * Returns a copy form this prototype with different values for experimentName, jobName and delay
-     *
-     * @param experimentName
-     * @param jobName
-     * @param delay
-     * @return
-     */
-    public Job cloneAndSet(String experimentName, String jobName, long delay, Integer duplicateNumber) {
-        return new Job(jarFile, runnerArguments, jarArguments, cmdBuilder,
-                runner, jobName, duplicateNumber, delay, experimentName);
-    }
-
     /* getter and setter */
 
     /**
@@ -90,7 +77,7 @@ public class Job {
      */
     public void setRunner(String runner) {
         this.runner = runner;
-        cmdBuilder = CommandBuilder.getCommandBuilder(runner);
+        cmdBuilder = CommandBuilder.getCommandBuilder(runner.toLowerCase());
     }
 
     public CommandBuilder getCmdBuilder() {
@@ -121,8 +108,6 @@ public class Job {
         if (arguments.isEmpty()) {
             arguments.addAll(newArguments);
         } else {
-            // TODO: [!] why is this variable never used??
-            ArrayList<Argument> argumentsToAdd = new ArrayList<>();
             for (Argument newArgument : newArguments) {
                 if (newArgument.getKey().isEmpty()) {
                     arguments.add(newArgument);

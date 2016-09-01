@@ -47,14 +47,8 @@ public abstract class CommandBuilder {
 
     public abstract String getCommand(ArrayList<Argument> runnerArguments, String jarFile, ArrayList<Argument> jarArguments);
 
-    @Deprecated
-    public abstract String getStartLine();
-    @Deprecated
-    public abstract String getStopLine();
-    @Deprecated
-    public abstract String getSubmittedLine();
-
     public abstract String getRunnerPrefix();
+    public abstract String extractJobID(String logLine);
     public abstract boolean isStartLine(String logLine);
     public abstract boolean isStopLine(String logLine);
     public abstract boolean isSubmittedLine(String logLine);

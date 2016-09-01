@@ -1,5 +1,8 @@
 package Core;
 
+import Core.commandBuilder.CommandBuilder;
+import Core.commandBuilder.FlinkCommandBuilder;
+import Core.commandBuilder.SparkCommandBuilder;
 import Core.modules.Freamon;
 import org.apache.log4j.Logger;
 import util.Config;
@@ -69,26 +72,31 @@ public class Yarn {
 
                 Process process = Runtime.getRuntime().exec(job.getCommand(), envp);
 
-                BufferedReader buff = new BufferedReader(new InputStreamReader(process.getInputStream()));
                 BufferedReader buffErr = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                BufferedReader buff;
+                CommandBuilder cmdBuilder = job.getCmdBuilder();
+                if (cmdBuilder instanceof SparkCommandBuilder) {
+                    buff = new BufferedReader(new InputStreamReader(process.getErrorStream()));
+                } else {
+                    buff = new BufferedReader(new InputStreamReader(process.getInputStream()));
+                }
 
                 String line;
                 long startTime = 0;
                 boolean jobStarted = false;
+//              summaryLog.println("Analyzing job output.");
                 while ((line = buff.readLine()) != null) {
                     logPrintStream.println(line);
-                    summaryLog.println("Analyzing job output.");
-                    if (!jobStarted && job.getCmdBuilder().isSubmittedLine(line)) {
-                        String jobID = line.substring(line.indexOf("Submitted application")).replace("Submitted application", "").trim();
-                        job.setJobID(jobID);
-                        LOG.info("Submitted " + job + '+' + job.getDelay() + "sec as " + jobID);
+                    if (!jobStarted && cmdBuilder.isSubmittedLine(line)) {
+                        job.setJobID(cmdBuilder.extractJobID(line));
+                        LOG.info("Submitted " + job + '+' + job.getDelay() + "sec as " + job.getJobID());
                         if (config.notifyFreamon()) {
                             Freamon.onSubmit(job.getJobID());
                         }
                     }
 
                     // once the job is marked as started don't check for the started line anymore
-                    if (!jobStarted && job.getCmdBuilder().isStartLine(line)) {
+                    if (!jobStarted && cmdBuilder.isStartLine(line)) {
                         startTime = System.currentTimeMillis();
                         if (config.notifyFreamon()) {
                             Freamon.onStart(job.getJobID(), startTime);
@@ -96,7 +104,7 @@ public class Yarn {
                         jobStarted = true;
                     }
 
-                    if (jobStarted && job.getCmdBuilder().isStopLine(line)) {
+                    if (jobStarted && cmdBuilder.isStopLine(line)) {
                         long endTime = System.currentTimeMillis();
                         long duration = (endTime - startTime);
                         LOG.info("Took " + duration / 1000
@@ -115,7 +123,9 @@ public class Yarn {
                 logPrintStream.close();
 
                 summaryLog.flush();
-                while ((line = buffErr.readLine()) != null) System.out.println("[STDERR] " + line);
+                if (cmdBuilder instanceof FlinkCommandBuilder) {
+                    while ((line = buffErr.readLine()) != null) System.out.println("[STDERR] " + line);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

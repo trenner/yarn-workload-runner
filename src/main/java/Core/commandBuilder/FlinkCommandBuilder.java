@@ -22,24 +22,13 @@ public class FlinkCommandBuilder extends CommandBuilder {
     }
 
     @Override
-    public String getStartLine() {
-        return "All TaskManagers are connected";
-    }
-
-    @Override
-    public String getStopLine() {
-//        return "The following messages were created by the YARN cluster while running the Job:";
-        return "Job execution switched to status FINISHED.";
-    }
-
-    @Override
-    public String getSubmittedLine() {
-        return "Submitted application";
-    }
-
-    @Override
     public String getRunnerPrefix() {
         return "-";
+    }
+
+    @Override
+    public String extractJobID(String logLine) {
+        return logLine.substring(logLine.indexOf("application_")).trim();
     }
 
     @Override

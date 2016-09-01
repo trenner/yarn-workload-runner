@@ -23,37 +23,27 @@ public class SparkCommandBuilder extends CommandBuilder {
     }
 
     @Override
-    public String getStartLine() {
-        return "not yet set";
-    }
-
-    @Override
-    public String getStopLine() {
-        return "not yet set";
-    }
-
-    @Override
-    public String getSubmittedLine() {
-        return "not yet set";
-    }
-
-    @Override
     public String getRunnerPrefix() {
         return "--";
     }
 
     @Override
+    public String extractJobID(String logLine) {
+        return logLine.substring(logLine.indexOf("application_")).trim();
+    }
+
+    @Override
     public boolean isStartLine(String logLine) {
-        return false;
+        return logLine.contains("(state: RUNNING)");
     }
 
     @Override
     public boolean isStopLine(String logLine) {
-        return false;
+        return logLine.contains("(state: FINISHED)");
     }
 
     @Override
     public boolean isSubmittedLine(String logLine) {
-        return false;
+        return logLine.contains("Submitted application");
     }
 }
