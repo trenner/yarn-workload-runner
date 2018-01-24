@@ -1,5 +1,6 @@
 package Core;
 
+import Core.modules.Freamon;
 import org.apache.log4j.BasicConfigurator;
 import org.apache.log4j.Logger;
 import parser.ScheduleParser;
@@ -63,6 +64,7 @@ public class YarnTimedGenerator {
                 } else {
                     Yarn yarn = new Yarn(schedule, summaryLog);
                     yarn.initiateJobExecution();
+                    Freamon.stopActor();
                 }
                 summaryLog.flush();
                 summaryLog.close();

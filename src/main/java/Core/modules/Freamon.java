@@ -12,6 +12,7 @@ import java.io.Serializable;
 public class Freamon extends UntypedActor {
 
     private static final ActorRef instance = getActor();
+    private static ActorSystem actorSystem;
 
     private static ActorRef getActor() {
         // TODO pass application.conf path in config.xml
@@ -20,10 +21,11 @@ public class Freamon extends UntypedActor {
                     + "\nakka.remote.netty.tcp.port=" + Config.getInstance().getConfigItem("akkaPort"))
             .withFallback(ConfigFactory.load());
 
-        final ActorSystem actorSystem = ActorSystem.create("yarnWorkloadRunnerSystem", config);
-
+        actorSystem = ActorSystem.create("yarnWorkloadRunnerSystem", config);
         return actorSystem.actorOf(Props.create(Freamon.class), "freamonSender");
     }
+
+
 
     private final ActorSelection freamonMaster = getFreamonMasterActor();
 
@@ -54,5 +56,9 @@ public class Freamon extends UntypedActor {
 
     public static void onStop(String jobID, long stopTime) {
         instance.tell(new Serializable[]{"jobStopped", jobID, stopTime}, instance);
+    }
+
+    public static void stopActor(){
+        actorSystem.terminate();
     }
 }
